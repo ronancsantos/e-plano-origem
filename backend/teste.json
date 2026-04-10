@@ -1,0 +1,31 @@
+{
+    "lingua_portuguesa": {
+        "nome_disciplina": "LP - Leitura e Oralidade",
+        "ano": [
+            {
+                "nome_ano": [
+                    "6º"
+                ],
+                "unidades_tematicas": [
+                    {
+                        "nome_unidade": "Leitura",
+                        "objeto_conhecimento": [
+                            {
+                                "nome_objeto": "Reconstrução das condições de produção e recepção dos textos e adequação do texto à construção composicional e ao estilo de gênero",
+                                "habilidades": [
+                                    {
+                                        "nome_habilidade": "(EF69LP29) Refletir sobre a relação entre os contextos de produção dos gêneros de divulgação científica – texto didático, artigo de divulgação científica, reportagem de divulgação científica, verbete de enciclopédia (impressa e digital), esquema, infográfico (estático e animado), relatório, relato multimidiático de campo, podcasts e vídeos variados de divulgação científica etc. – e os aspectos relativos à construção composicional e às marcas linguística características desses gêneros, de forma a ampliar suas possibilidades de compreensão (e produção) de textos pertencentes a esses gêneros."
+                                    }
+                                ]
+                            },
+                            {
+                                "nome_objeto": "Relação entre textos",
+                                "habilidades": [
+                                    {
+                                        "nome_habilidade": "(EF69LP30) Comparar, com a ajuda do professor, conteúdos, dados e informações de diferentes fontes, levando em conta seus contextos de produção e referências, identificando coincidências, complementaridades e contradições, de forma a poder identificar erros/imprecisões conceituais, compreender e posicionar-se criticamente sobre os conteúdos e informações em questão."
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
