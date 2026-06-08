@@ -1,4 +1,4 @@
-const API = "http://localhost:3000";
+const API = "https://eplano-backend.onrender.com";
 
 // 🔹 LISTAR PLANOS
 export const listarPlanos = async () => {
