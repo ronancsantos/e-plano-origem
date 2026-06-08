@@ -1,6 +1,6 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const db = require("../database");
+const supabase = require("../supabase");
 
 const router = express.Router();
 
