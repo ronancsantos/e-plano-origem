@@ -30,99 +30,91 @@ function autenticarToken(req, res, next) {
 // ============================
 // LOGIN
 // ============================
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, senha } = req.body;
 
   if (!email || !senha) {
     return res.status(400).json({ erro: "Informe e-mail e senha." });
   }
 
-  db.get(
-    `SELECT id, nome, email, senha, perfil
-     FROM usuarios
-     WHERE email = ?`,
-    [email],
-    (err, usuario) => {
-      if (err) {
-        return res.status(500).json({ erro: err.message });
+  try {
+    const { data: usuario } = await supabase
+      .from("usuarios")
+      .select("*")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (usuario) {
+      if (usuario.senha !== senha) {
+        return res.status(401).json({ erro: "Senha inválida." });
       }
 
-      if (usuario) {
-        if (usuario.senha !== senha) {
-          return res.status(401).json({ erro: "Senha inválida." });
-        }
+      const perfil = usuario.perfil || "coordenador";
 
-        const perfil = usuario.perfil || "coordenador";
-
-        const token = jwt.sign(
-          {
-            id: usuario.id,
-            nome: usuario.nome,
-            email: usuario.email,
-            perfil,
-            tipo: perfil
-          },
-          SECRET,
-          { expiresIn: "1d" }
-        );
-
-        return res.json({
-          token,
-          usuario: {
-            id: usuario.id,
-            nome: usuario.nome,
-            email: usuario.email,
-            perfil,
-            tipo: perfil
-          }
-        });
-      }
-
-      db.get(
-        `SELECT id, nome, email, senha, turno
-         FROM professores
-         WHERE email = ?`,
-        [email],
-        (err2, professor) => {
-          if (err2) {
-            return res.status(500).json({ erro: err2.message });
-          }
-
-          if (!professor) {
-            return res.status(404).json({ erro: "Usuário não encontrado." });
-          }
-
-          if (professor.senha !== senha) {
-            return res.status(401).json({ erro: "Senha inválida." });
-          }
-
-          const token = jwt.sign(
-            {
-              id: professor.id,
-              nome: professor.nome,
-              email: professor.email,
-              perfil: "professor",
-              tipo: "professor"
-            },
-            SECRET,
-            { expiresIn: "1d" }
-          );
-
-          return res.json({
-            token,
-            usuario: {
-              id: professor.id,
-              nome: professor.nome,
-              email: professor.email,
-              turno: professor.turno,
-              perfil: "professor",
-              tipo: "professor"
-            }
-          });
-        }
+      const token = jwt.sign(
+        {
+          id: usuario.id,
+          nome: usuario.nome,
+          email: usuario.email,
+          perfil,
+          tipo: perfil
+        },
+        SECRET,
+        { expiresIn: "1d" }
       );
+
+      return res.json({
+        token,
+        usuario: {
+          id: usuario.id,
+          nome: usuario.nome,
+          email: usuario.email,
+          perfil,
+          tipo: perfil
+        }
+      });
     }
-  );
+
+    const { data: professor } = await supabase
+      .from("professores")
+      .select("*")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (!professor) {
+      return res.status(404).json({ erro: "Usuário não encontrado." });
+    }
+
+    if (professor.senha !== senha) {
+      return res.status(401).json({ erro: "Senha inválida." });
+    }
+
+    const token = jwt.sign(
+      {
+        id: professor.id,
+        nome: professor.nome,
+        email: professor.email,
+        perfil: "professor",
+        tipo: "professor"
+      },
+      SECRET,
+      { expiresIn: "1d" }
+    );
+
+    return res.json({
+      token,
+      usuario: {
+        id: professor.id,
+        nome: professor.nome,
+        email: professor.email,
+        turno: professor.turno,
+        perfil: "professor",
+        tipo: "professor"
+      }
+    });
+  } catch (erro) {
+    return res.status(500).json({ erro: erro.message });
+  }
 });
 
 // ============================
@@ -136,101 +128,132 @@ router.get("/me", autenticarToken, (req, res) => {
 // CADASTRAR USUÁRIO
 // APENAS admin e coordenador
 // ============================
-router.post("/register", autenticarToken, (req, res) => {
+router.post("/register", autenticarToken, async (req, res) => {
   const { nome, email, senha, tipo, perfil } = req.body;
 
   const tipoFinal = tipo || perfil;
 
   if (!nome || !email || !senha || !tipoFinal) {
-    return res.status(400).json({ erro: "Preencha nome, e-mail, senha e tipo." });
+    return res.status(400).json({
+      erro: "Preencha nome, e-mail, senha e tipo."
+    });
   }
 
-  if (tipoFinal !== "admin" && tipoFinal !== "coordenador") {
-    return res.status(400).json({ erro: "Nesta tela só é permitido cadastrar admin ou coordenador." });
+  if (
+    tipoFinal !== "admin" &&
+    tipoFinal !== "coordenador"
+  ) {
+    return res.status(400).json({
+      erro: "Nesta tela só é permitido cadastrar admin ou coordenador."
+    });
   }
 
   if (req.usuario.perfil !== "admin") {
-    return res.status(403).json({ erro: "Apenas administradores podem cadastrar usuários." });
+    return res.status(403).json({
+      erro: "Apenas administradores podem cadastrar usuários."
+    });
   }
 
-  db.run(
-    `INSERT INTO usuarios (nome, email, senha, perfil)
-     VALUES (?, ?, ?, ?)`,
-    [nome, email, senha, tipoFinal],
-    function (err) {
-      if (err) {
-        if (err.message.includes("UNIQUE constraint failed")) {
-          return res.status(400).json({ erro: "Já existe um usuário com este e-mail." });
-        }
+  const { data: existente } = await supabase
+    .from("usuarios")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
 
-        return res.status(500).json({ erro: err.message });
+  if (existente) {
+    return res.status(400).json({
+      erro: "Já existe um usuário com este e-mail."
+    });
+  }
+
+  const { data, error } = await supabase
+    .from("usuarios")
+    .insert([
+      {
+        nome,
+        email,
+        senha,
+        perfil: tipoFinal
       }
+    ])
+    .select()
+    .single();
 
-      return res.json({
-        mensagem: "Usuário cadastrado com sucesso.",
-        usuario: {
-          id: this.lastID,
-          nome,
-          email,
-          perfil: tipoFinal,
-          tipo: tipoFinal
-        }
-      });
+  if (error) {
+    return res.status(500).json({
+      erro: error.message
+    });
+  }
+
+  return res.json({
+    mensagem: "Usuário cadastrado com sucesso.",
+    usuario: {
+      id: data.id,
+      nome: data.nome,
+      email: data.email,
+      perfil: data.perfil,
+      tipo: data.perfil
     }
-  );
+  });
 });
 
 // ============================
 // LISTAR USUÁRIOS
 // ============================
-router.get("/usuarios", autenticarToken, (req, res) => {
-  db.all(
-    `SELECT id, nome, email, perfil
-     FROM usuarios
-     ORDER BY nome ASC`,
-    [],
-    (err, rows) => {
-      if (err) {
-        return res.status(500).json({ erro: err.message });
-      }
+router.get("/usuarios", autenticarToken, async (req, res) => {
+  const { data, error } = await supabase
+    .from("usuarios")
+    .select("id,nome,email,perfil")
+    .order("nome");
 
-      const usuarios = rows.map((u) => ({
-        id: u.id,
-        nome: u.nome,
-        email: u.email,
-        perfil: u.perfil,
-        tipo: u.perfil
-      }));
+  if (error) {
+    return res.status(500).json({
+      erro: error.message
+    });
+  }
 
-      res.json(usuarios);
-    }
+  res.json(
+    data.map((u) => ({
+      id: u.id,
+      nome: u.nome,
+      email: u.email,
+      perfil: u.perfil,
+      tipo: u.perfil
+    }))
   );
 });
 
 // ============================
 // DELETAR USUÁRIO
 // ============================
-router.delete("/usuarios/:id", autenticarToken, (req, res) => {
+router.delete("/usuarios/:id", autenticarToken, async (req, res) => {
   const { id } = req.params;
 
   if (req.usuario.perfil !== "admin") {
-    return res.status(403).json({ erro: "Apenas administradores podem excluir usuários." });
+    return res.status(403).json({
+      erro: "Apenas administradores podem excluir usuários."
+    });
   }
 
   if (Number(req.usuario.id) === Number(id)) {
-    return res.status(400).json({ erro: "Você não pode excluir seu próprio usuário." });
+    return res.status(400).json({
+      erro: "Você não pode excluir seu próprio usuário."
+    });
   }
 
-  db.run(`DELETE FROM usuarios WHERE id = ?`, [id], function (err) {
-    if (err) {
-      return res.status(500).json({ erro: err.message });
-    }
+  const { error } = await supabase
+    .from("usuarios")
+    .delete()
+    .eq("id", id);
 
-    if (this.changes === 0) {
-      return res.status(404).json({ erro: "Usuário não encontrado." });
-    }
+  if (error) {
+    return res.status(500).json({
+      erro: error.message
+    });
+  }
 
-    res.json({ mensagem: "Usuário removido com sucesso." });
+  res.json({
+    mensagem: "Usuário removido com sucesso."
   });
 });
 
