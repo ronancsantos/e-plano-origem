@@ -9,8 +9,14 @@ app.use(cors());
 app.use(express.json());
 app.use("/auth", authRoutes);
 
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+  ],
+  credentials: true
+}));
 
-// 🔥 Corrige qualquer formato errado de periodo
+// Corrige qualquer formato errado de periodo
 const parsePeriodo = (p) => {
   try {
     const parsed = JSON.parse(p);
@@ -21,7 +27,7 @@ const parsePeriodo = (p) => {
   }
 };
 
-// 🔥 Converte campos JSON com segurança
+// Converte campos JSON com segurança
 const parseJSON = (value) => {
   try {
     return JSON.parse(value || "[]");
@@ -1212,6 +1218,6 @@ app.post("/professores/:professorId/modelos/:modeloId/plano", (req, res) => {
 // ================= START =================
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log("Servidor rodando na porta", PORT);
 });

@@ -252,9 +252,10 @@ export const listarPlanosProfessor = async () => {
 
   return res.json();
 };
+
 export const listarResumoDashboardCoordenador = async () => {
   const res = await fetch(`${API}/dashboard/coordenador`);
-  
+
   if (!res.ok) {
     throw new Error("Erro ao listar resumo do dashboard");
   }
