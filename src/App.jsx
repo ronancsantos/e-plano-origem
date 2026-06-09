@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -17,7 +17,7 @@ import DashboardCoordenador from "./pages/DashboardCoordenador";
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
 
@@ -60,7 +60,7 @@ export default function App() {
           <Route
             path="/professor/plano/:id/visualizar"
             element={
-            <ProtectedRoute perfisPermitidos={["admin", ,"professor","coordenador"]}>
+            <ProtectedRoute perfisPermitidos={["admin","professor","coordenador"]}>
                 <VisualizarPlanoProfessor />
             </ProtectedRoute>
           }
@@ -106,13 +106,14 @@ export default function App() {
             path="/dashboard-coordenador"
             element={
               <ProtectedRoute perfisPermitidos={["coordenador", "admin"]}>
-                < DashboardCoordenador/>
+                <DashboardCoordenador />
               </ProtectedRoute>
             }
           />
 
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </AuthProvider>
   );
 }

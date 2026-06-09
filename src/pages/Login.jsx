@@ -33,7 +33,7 @@ export default function Login() {
         const perfil = resposta.usuario.tipo || resposta.usuario.perfil;
 
         if (perfil === "admin") {
-          navigate("/usuarios");
+          navigate("/");
         } else if (perfil === "coordenador") {
           navigate("/");
         } else if (perfil === "professor") {
