@@ -1,4 +1,5 @@
 ﻿const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const supabase = require("./supabase");
@@ -121,42 +122,30 @@ const parsePlano = (plano) => ({
 app.post("/planos", async (req, res) => {
   try {
     const {
-      professor_id,
       componente,
       ano,
       periodo,
-      campo_atuacao,
-      genero,
       habilidades,
       objetos,
       metodologias,
-      metodologias_recursos,
       instrumentos,
-      instrumentos_recursos,
       tipos_avaliacao,
-      status,
-      progresso
+      status
     } = req.body;
 
     const { data, error } = await supabase
       .from("planos")
       .insert([
         {
-          professor_id: professor_id || null,
           componente: componente || "",
           ano: ano || "",
           periodo: periodo || "",
-          campo_atuacao: campo_atuacao || "",
-          genero: genero || "",
           habilidades: JSON.stringify(habilidades || []),
           objetos: JSON.stringify(objetos || []),
           metodologias: JSON.stringify(metodologias || []),
-          metodologias_recursos: JSON.stringify(metodologias_recursos || []),
           instrumentos: JSON.stringify(instrumentos || []),
-          instrumentos_recursos: JSON.stringify(instrumentos_recursos || []),
           tipos_avaliacao: JSON.stringify(tipos_avaliacao || []),
-          status: status || "rascunho",
-          progresso: progresso || 0
+          status: status || "rascunho"
         }
       ])
       .select("id")
@@ -758,6 +747,14 @@ app.post("/professores/:professorId/modelos/:modeloId/plano", async (req, res) =
   } catch (error) {
     return supabaseError(res, error);
   }
+});
+
+// Servir arquivos estáticos do frontend (dist)
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// SPA fallback - servir index.html para rotas não encontradas
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
