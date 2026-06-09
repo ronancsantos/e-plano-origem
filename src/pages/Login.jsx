@@ -15,6 +15,11 @@ export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
+  function normalizarPerfil(perfil) {
+    const valor = (perfil || "").trim().toLowerCase();
+    return valor === "administrador" ? "admin" : valor;
+  }
+
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
@@ -30,10 +35,10 @@ export default function Login() {
       if (resposta.token) {
         login(resposta);
 
-        const perfil = resposta.usuario.tipo || resposta.usuario.perfil;
+        const perfil = normalizarPerfil(resposta.usuario.tipo || resposta.usuario.perfil);
 
         if (perfil === "admin") {
-          navigate("/");
+          navigate("/usuarios");
         } else if (perfil === "coordenador") {
           navigate("/");
         } else if (perfil === "professor") {

@@ -20,7 +20,12 @@ export default function Usuarios() {
   const { usuario, logout } = useAuth();
   const navigate = useNavigate();
 
-  const tipoUsuarioLogado = usuario?.tipo || usuario?.perfil || "";
+  const normalizarTipo = (tipo) => {
+    const valor = (tipo || "").trim().toLowerCase();
+    return valor === "administrador" ? "admin" : valor;
+  };
+
+  const tipoUsuarioLogado = normalizarTipo(usuario?.tipo || usuario?.perfil);
 
   async function carregarUsuarios() {
     try {
@@ -28,7 +33,7 @@ export default function Usuarios() {
 
       if (Array.isArray(dados)) {
         const filtrados = dados.filter((u) => {
-          const tipo = u.tipo || u.perfil;
+          const tipo = normalizarTipo(u.tipo || u.perfil);
           return tipo === "admin" || tipo === "coordenador";
         });
 
@@ -119,8 +124,8 @@ export default function Usuarios() {
   function podeExcluir(alvo) {
     if (!usuario) return false;
 
-    const tipoAtual = usuario.tipo || usuario.perfil;
-    const tipoAlvo = alvo.tipo || alvo.perfil;
+    const tipoAtual = normalizarTipo(usuario.tipo || usuario.perfil);
+    const tipoAlvo = normalizarTipo(alvo.tipo || alvo.perfil);
 
     if (Number(alvo.id) === Number(usuario.id)) return false;
 
@@ -242,7 +247,7 @@ export default function Usuarios() {
                 <tbody>
                   {usuarios.length > 0 ? (
                     usuarios.map((u) => {
-                      const tipoItem = u.tipo || u.perfil || "";
+                      const tipoItem = normalizarTipo(u.tipo || u.perfil);
 
                       return (
                         <tr key={u.id}>
