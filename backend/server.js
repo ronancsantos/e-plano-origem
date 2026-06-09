@@ -1,20 +1,21 @@
 const express = require("express");
 const cors = require("cors");
-const fs = require("fs");
 const authRoutes = require("./routes/auth");
-const db = require("./database.js");
+const supabase = require("./supabase");
 
 const app = express();
-app.use(cors());
-app.use(express.json());
-app.use("/auth", authRoutes);
 
 app.use(cors({
   origin: [
-    "http://localhost:5173",
+    "http://localhost:5173"
   ],
   credentials: true
 }));
+
+app.use(express.json());
+
+// ROTAS
+app.use("/auth", authRoutes);
 
 // Corrige qualquer formato errado de periodo
 const parsePeriodo = (p) => {
@@ -1221,3 +1222,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log("Servidor rodando na porta", PORT);
 });
+

@@ -38,7 +38,8 @@ router.post("/login", async (req, res) => {
   }
 
   try {
-    const { data: usuario } = await supabase
+    // USUÁRIOS
+    let { data: usuario } = await supabase
       .from("usuarios")
       .select("*")
       .eq("email", email)
@@ -49,33 +50,23 @@ router.post("/login", async (req, res) => {
         return res.status(401).json({ erro: "Senha inválida." });
       }
 
-      const perfil = usuario.perfil || "coordenador";
-
       const token = jwt.sign(
         {
           id: usuario.id,
           nome: usuario.nome,
           email: usuario.email,
-          perfil,
-          tipo: perfil
+          perfil: usuario.perfil,
+          tipo: usuario.perfil
         },
         SECRET,
         { expiresIn: "1d" }
       );
 
-      return res.json({
-        token,
-        usuario: {
-          id: usuario.id,
-          nome: usuario.nome,
-          email: usuario.email,
-          perfil,
-          tipo: perfil
-        }
-      });
+      return res.json({ token, usuario });
     }
 
-    const { data: professor } = await supabase
+    // PROFESSORES
+    let { data: professor } = await supabase
       .from("professores")
       .select("*")
       .eq("email", email)
@@ -103,17 +94,11 @@ router.post("/login", async (req, res) => {
 
     return res.json({
       token,
-      usuario: {
-        id: professor.id,
-        nome: professor.nome,
-        email: professor.email,
-        turno: professor.turno,
-        perfil: "professor",
-        tipo: "professor"
-      }
+      usuario: professor
     });
-  } catch (erro) {
-    return res.status(500).json({ erro: erro.message });
+
+  } catch (err) {
+    return res.status(500).json({ erro: err.message });
   }
 });
 
