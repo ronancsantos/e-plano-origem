@@ -5,12 +5,24 @@ const supabase = require("./supabase");
 
 const app = express();
 
-app.use(
-  cors({
-    origin: ["http://localhost:5173"],
-    credentials: true
-  })
-);
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://eplano.semedcarutapera.com"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // permite requests sem origin (mobile, postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Bloqueado pelo CORS"));
+  },
+  credentials: true
+}));
 
 app.use(express.json());
 app.use("/auth", authRoutes);
