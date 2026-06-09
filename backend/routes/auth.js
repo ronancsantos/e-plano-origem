@@ -1,10 +1,11 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const supabase = require("../supabase");
 
 const router = express.Router();
 
-const SECRET = "seu_segredo_super_seguro";
+const SECRET = process.env.JWT_SECRET || "seu_segredo_super_seguro";
 
 // ============================
 // MIDDLEWARE DE TOKEN
@@ -39,14 +40,34 @@ router.post("/login", async (req, res) => {
 
   try {
     // USUÁRIOS
-    let { data: usuario } = await supabase
+    let { data: usuario, error: errUsuario } = await supabase
       .from("usuarios")
       .select("*")
       .eq("email", email)
       .maybeSingle();
 
+    if (errUsuario) return res.status(500).json({ erro: errUsuario.message });
+
     if (usuario) {
-      if (usuario.senha !== senha) {
+      let passwordMatches = false;
+
+      try {
+        if (typeof usuario.senha === 'string' && usuario.senha.startsWith('$2')) {
+          passwordMatches = await bcrypt.compare(senha, usuario.senha);
+        } else {
+          // support existing plaintext passwords: if match, rehash and update
+          passwordMatches = usuario.senha === senha;
+          if (passwordMatches) {
+            const hashed = await bcrypt.hash(senha, 10);
+            await supabase.from('usuarios').update({ senha: hashed }).eq('id', usuario.id);
+            usuario.senha = hashed;
+          }
+        }
+      } catch (e) {
+        return res.status(500).json({ erro: 'Erro ao validar senha.' });
+      }
+
+      if (!passwordMatches) {
         return res.status(401).json({ erro: "Senha inválida." });
       }
 
@@ -66,18 +87,33 @@ router.post("/login", async (req, res) => {
     }
 
     // PROFESSORES
-    let { data: professor } = await supabase
+    let { data: professor, error: errProfessor } = await supabase
       .from("professores")
       .select("*")
       .eq("email", email)
       .maybeSingle();
 
+    if (errProfessor) return res.status(500).json({ erro: errProfessor.message });
+
     if (!professor) {
       return res.status(404).json({ erro: "Usuário não encontrado." });
     }
 
-    if (professor.senha !== senha) {
-      return res.status(401).json({ erro: "Senha inválida." });
+    try {
+      let passwordMatches = false;
+      if (typeof professor.senha === 'string' && professor.senha.startsWith('$2')) {
+        passwordMatches = await bcrypt.compare(senha, professor.senha);
+      } else {
+        passwordMatches = professor.senha === senha;
+        if (passwordMatches) {
+          const hashed = await bcrypt.hash(senha, 10);
+          await supabase.from('professores').update({ senha: hashed }).eq('id', professor.id);
+          professor.senha = hashed;
+        }
+      }
+      if (!passwordMatches) return res.status(401).json({ erro: "Senha inválida." });
+    } catch (e) {
+      return res.status(500).json({ erro: 'Erro ao validar senha.' });
     }
 
     const token = jwt.sign(
@@ -157,7 +193,7 @@ router.post("/register", autenticarToken, async (req, res) => {
       {
         nome,
         email,
-        senha,
+        senha: await bcrypt.hash(senha, 10),
         perfil: tipoFinal
       }
     ])

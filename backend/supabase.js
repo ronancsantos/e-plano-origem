@@ -1,9 +1,15 @@
+require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
-module.exports = supabase;
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('Missing SUPABASE_URL or SUPABASE_ANON_KEY. Add them to backend/.env or environment variables.');
+  // do not attempt to create client without keys
+  module.exports = null;
+} else {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  module.exports = supabase;
+}
 
