@@ -526,7 +526,7 @@ app.get("/professores/:id/modelos", async (req, res) => {
   try {
     const professorId = req.params.id;
     const [{ data: atuacoes, error: errAtuacoes }, { data: planos, error: errPlanos }, { data: planosProfessor, error: errPlanosProfessor }, { data: componentes, error: errComponentes }, { data: turmas, error: errTurmas }] = await Promise.all([
-      supabase.from("professor_atuacoes").select("* ").eq("professor_id", professorId),
+      supabase.from("professor_atuacoes").select("*").eq("professor_id", professorId),
       supabase.from("planos").select("*").eq("envio_status", "enviado"),
       supabase.from("planos_professor").select("professor_id,modelo_id,status").eq("professor_id", professorId),
       supabase.from("componentes").select("id,nome"),
@@ -540,14 +540,14 @@ app.get("/professores/:id/modelos", async (req, res) => {
     if (!atuacoes || atuacoes.length === 0) return res.json([]);
 
     const componentesMap = new Map((componentes || []).map((item) => [item.id, item.nome]));
-    const turmasMap = new Map((turmas || []).map((item) => [item.id, `${item.ano} - Turma ${item.turma}`]));
+    const turmasAnoMap = new Map((turmas || []).map((item) => [item.id, item.ano]));
 
     const modelosFiltrados = (planos || []).filter((plano) => {
       const componentePlano = normalizarTexto(plano.componente);
       const anoPlano = normalizarAno(plano.ano);
       return (atuacoes || []).some((atuacao) => {
         const componenteAtuacao = normalizarTexto(componentesMap.get(atuacao.componente_id) || "");
-        const anoAtuacao = normalizarAno(turmasMap.get(atuacao.turma_id) || "");
+        const anoAtuacao = normalizarAno(turmasAnoMap.get(atuacao.turma_id) || "");
         return componenteAtuacao === componentePlano && anoAtuacao === anoPlano;
       });
     });
@@ -622,7 +622,7 @@ app.get("/dashboard/coordenador", async (req, res) => {
     }
 
     const componenteMap = new Map((componentes || []).map((item) => [item.id, item.nome]));
-    const turmaMap = new Map((turmas || []).map((item) => [item.id, `${item.ano} - Turma ${item.turma}`]));
+    const turmaAnoMap = new Map((turmas || []).map((item) => [item.id, item.ano]));
 
     const mapaProfessores = new Map();
     (professores || []).forEach((professor) => {
@@ -638,7 +638,7 @@ app.get("/dashboard/coordenador", async (req, res) => {
       if (!professor) return;
       professor.atribuicoes.push({
         componente_nome: componenteMap.get(atuacao.componente_id) || "",
-        turma_ano: turmaMap.get(atuacao.turma_id) || ""
+        turma_ano: turmaAnoMap.get(atuacao.turma_id) || ""
       });
     });
 
