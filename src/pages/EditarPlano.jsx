@@ -108,7 +108,7 @@ export default function EditarPlano() {
     // fecha toast e navega após 1.5s
     setTimeout(() => {
       setPopup({ show: false, mensagem: "", tipo: "" });
-      navigate("/");
+      navigate("/planos");
     }, 1500);
   };
 

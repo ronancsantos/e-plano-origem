@@ -130,7 +130,11 @@ router.post("/login", async (req, res) => {
 
     return res.json({
       token,
-      usuario: professor
+      usuario: {
+        ...professor,
+        perfil: "professor",
+        tipo: "professor"
+      }
     });
 
   } catch (err) {

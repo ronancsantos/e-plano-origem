@@ -42,7 +42,7 @@ export default function Coordenador() {
     setPopup({ show: true, mensagem, tipo });
     setTimeout(() => {
       setPopup({ show: false, mensagem: "", tipo: "" });
-      if (tipo === "sucesso") navigate("/");
+      if (tipo === "sucesso") navigate("/planos");
     }, 2500);
   };
 
@@ -183,7 +183,7 @@ export default function Coordenador() {
       setPopup({ show: true, mensagem: "Plano cadastrado com sucesso!", tipo: "sucesso" });
 
       setTimeout(() => {
-        navigate("/");
+        navigate("/planos");
       }, 3000);
 
 

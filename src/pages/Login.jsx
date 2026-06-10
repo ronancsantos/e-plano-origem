@@ -40,7 +40,7 @@ export default function Login() {
         if (perfil === "admin") {
           navigate("/usuarios");
         } else if (perfil === "coordenador") {
-          navigate("/");
+          navigate("/planos");
         } else if (perfil === "professor") {
           navigate("/professor");
         } else {

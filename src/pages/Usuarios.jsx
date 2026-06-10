@@ -150,7 +150,7 @@ export default function Usuarios() {
           </div>
 
           <div className="acoes-topo">
-            <button className="btn-voltar" onClick={() => navigate("/")}>
+            <button className="btn-voltar" onClick={() => navigate("/planos")}>
               Voltar
             </button>
 

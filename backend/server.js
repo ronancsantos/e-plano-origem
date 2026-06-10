@@ -1,6 +1,7 @@
 ﻿const express = require("express");
 const path = require("path");
 const cors = require("cors");
+const bcrypt = require("bcryptjs");
 const authRoutes = require("./routes/auth");
 const supabase = require("./supabase");
 
@@ -430,7 +431,12 @@ app.post("/professores", async (req, res) => {
     if (errExistente) return supabaseError(res, errExistente);
     if (existente) return res.status(400).json({ error: "Já existe um professor com este e-mail." });
 
-    const { data, error } = await supabase.from("professores").insert([{ nome, turno, email, senha }]).select("id").single();
+    const senhaHash = await bcrypt.hash(senha, 10);
+    const { data, error } = await supabase
+      .from("professores")
+      .insert([{ nome, turno, email, senha: senhaHash }])
+      .select("id")
+      .single();
     if (error) return supabaseError(res, error);
     const errorAtribuicoes = await inserirAtuacoesProfessor(data.id, atribuicoes);
     if (errorAtribuicoes) return supabaseError(res, errorAtribuicoes);
@@ -451,9 +457,11 @@ app.put("/professores/:id", async (req, res) => {
       return res.status(400).json({ error: "Adicione pelo menos uma atribuição." });
     }
 
+    const senhaHash = senha.startsWith("$2") ? senha : await bcrypt.hash(senha, 10);
+
     const { error } = await supabase
       .from("professores")
-      .update({ nome, turno, email, senha })
+      .update({ nome, turno, email, senha: senhaHash })
       .eq("id", professorId);
     if (error) {
       if (error.message && error.message.includes("duplicate key value")) {

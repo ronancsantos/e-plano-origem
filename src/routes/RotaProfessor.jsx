@@ -8,7 +8,7 @@ export default function RotaProfessor({ children }) {
   }
 
   if (usuario.tipo !== "professor") {
-    return <Navigate to="/" />;
+    return <Navigate to="/planos" />;
   }
 
   return children;

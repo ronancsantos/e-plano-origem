@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 import Login from "./pages/Login";
@@ -14,6 +14,35 @@ import EditarPlanoProfessor from "./pages/EditarPlanoProfessor";
 import VisualizarPlanoProfessor from "./pages/VisualizarPlanoProfessor";
 import DashboardCoordenador from "./pages/DashboardCoordenador";
 
+function normalizarPerfil(perfil) {
+  const valor = (perfil || "").trim().toLowerCase();
+  return valor === "administrador" ? "admin" : valor;
+}
+
+function RedirecionarPorPerfil() {
+  const { usuario, loading } = useAuth();
+
+  if (loading) {
+    return <div style={{ padding: "30px" }}>Carregando...</div>;
+  }
+
+  if (!usuario) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const perfil = normalizarPerfil(usuario.tipo || usuario.perfil);
+
+  if (perfil === "admin") {
+    return <Navigate to="/usuarios" replace />;
+  }
+
+  if (perfil === "professor") {
+    return <Navigate to="/professor" replace />;
+  }
+
+  return <Navigate to="/planos" replace />;
+}
+
 export default function App() {
   return (
     <AuthProvider>
@@ -21,8 +50,10 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
 
+          <Route path="/" element={<RedirecionarPorPerfil />} />
+
           <Route
-            path="/"
+            path="/planos"
             element={
               <ProtectedRoute perfisPermitidos={["admin", "coordenador"]}>
                 <Planos />
@@ -111,7 +142,7 @@ export default function App() {
             }
           />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<RedirecionarPorPerfil />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

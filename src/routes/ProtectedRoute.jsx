@@ -35,7 +35,7 @@ export default function ProtectedRoute({ children, perfisPermitidos = [] }) {
       return <Navigate to="/usuarios" replace />;
     }
 
-    return <Navigate to="/" replace />;
+    return <Navigate to="/planos" replace />;
   }
 
   return children;
