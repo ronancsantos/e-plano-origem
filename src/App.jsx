@@ -13,6 +13,7 @@ import Professores from "./pages/Professores";
 import EditarPlanoProfessor from "./pages/EditarPlanoProfessor";
 import VisualizarPlanoProfessor from "./pages/VisualizarPlanoProfessor";
 import DashboardCoordenador from "./pages/DashboardCoordenador";
+import CoordenadorLayout from "./pages/CoordenadorLayout";
 
 function normalizarPerfil(perfil) {
   const valor = (perfil || "").trim().toLowerCase();
@@ -40,7 +41,11 @@ function RedirecionarPorPerfil() {
     return <Navigate to="/professor" replace />;
   }
 
-  return <Navigate to="/planos" replace />;
+  if (perfil === "coordenador") {
+    return <Navigate to="/dashboard-coordenador" replace />;
+  }
+
+  return <Navigate to="/dashboard-coordenador" replace />;
 }
 
 export default function App() {
@@ -56,7 +61,9 @@ export default function App() {
             path="/planos"
             element={
               <ProtectedRoute perfisPermitidos={["admin", "coordenador"]}>
-                <Planos />
+                <CoordenadorLayout>
+                  <Planos />
+                </CoordenadorLayout>
               </ProtectedRoute>
             }
           />
@@ -65,7 +72,20 @@ export default function App() {
             path="/coordenador"
             element={
               <ProtectedRoute perfisPermitidos={["admin", "coordenador"]}>
-                <Coordenador />
+                <CoordenadorLayout>
+                  <Coordenador />
+                </CoordenadorLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/coordenador/novo-plano"
+            element={
+              <ProtectedRoute perfisPermitidos={["admin", "coordenador"]}>
+                <CoordenadorLayout>
+                  <Coordenador />
+                </CoordenadorLayout>
               </ProtectedRoute>
             }
           />
@@ -119,7 +139,9 @@ export default function App() {
             path="/professores-cadastrados"
             element={
               <ProtectedRoute perfisPermitidos={["admin", "coordenador"]}>
-                <Professores />
+                <CoordenadorLayout>
+                  <Professores />
+                </CoordenadorLayout>
               </ProtectedRoute>
             }
           />

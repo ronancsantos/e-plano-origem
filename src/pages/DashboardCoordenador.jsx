@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
     LogOut,
-    Home,
+    ClipboardList,
     User,
     Info,
     TextAlignJustify,
@@ -11,11 +11,11 @@ import {
     Menu,
     X,
     CheckCircle2,
-    Clock3,
     AlertCircle,
     Users,
     RefreshCw,
-    LayoutDashboard
+    LayoutDashboard,
+    BookOpenCheck
 } from "lucide-react";
 import { listarResumoDashboardCoordenador } from "../services/api";
 import "./dashboard-coordenador.css";
@@ -24,13 +24,14 @@ import logoMini from "./logo-professor.png";
 
 export default function DashboardCoordenador() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { usuario, logout } = useAuth();
 
     const [professoresComResumo, setProfessoresComResumo] = useState([]);
     const [loading, setLoading] = useState(true);
     const [atualizando, setAtualizando] = useState(false);
 
-    const [menuAtivo, setMenuAtivo] = useState("inicio");
+    const [menuAtivo, setMenuAtivo] = useState("acompanhamento");
     const [sidebarExpandida, setSidebarExpandida] = useState(true);
     const [mobileMenuAberto, setMobileMenuAberto] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 900);
@@ -73,7 +74,7 @@ export default function DashboardCoordenador() {
 
         const intervalo = setInterval(() => {
             carregarDados(false);
-        }, 5000);
+        }, 20000);
 
         return () => clearInterval(intervalo);
     }, []);
@@ -89,10 +90,6 @@ export default function DashboardCoordenador() {
             return acc + Number(professor.concluidos || 0);
         }, 0);
 
-        const totalAndamento = professoresComResumo.reduce((acc, professor) => {
-            return acc + Number(professor.andamento || 0);
-        }, 0);
-
         const totalPendentes = professoresComResumo.reduce((acc, professor) => {
             return acc + Number(professor.pendentes || 0);
         }, 0);
@@ -106,7 +103,6 @@ export default function DashboardCoordenador() {
             totalProfessores,
             totalPlanos,
             totalConcluidos,
-            totalAndamento,
             totalPendentes,
             professoresEmDia,
         };
@@ -123,6 +119,11 @@ export default function DashboardCoordenador() {
         navigate("/login");
     }
 
+    function navegarMenu(rota) {
+        setMobileMenuAberto(false);
+        navigate(rota);
+    }
+
     function renderInicio() {
         return (
             <>
@@ -136,7 +137,7 @@ export default function DashboardCoordenador() {
                         </button>
 
                         <div>
-                            <h1>Dashboard do Coordenador</h1>
+                            <h1>Acompanhemento</h1>
                         </div>
                     </div>
 
@@ -151,13 +152,23 @@ export default function DashboardCoordenador() {
                 </header>
 
                 <section className="cards-grid cards-grid-top">
-                    <div className="card-resumo total">
+                    <div className="card-resumo professores-dia">
                         <div className="card-icon">
                             <Users size={24} />
                         </div>
                         <div className="card-info">
-                            <span>Professores cadastrados</span>
-                            <strong>{resumoGeral.totalProfessores}</strong>
+                            <span>Professores com planos concluídos</span>
+                            <strong>{resumoGeral.professoresEmDia}</strong>
+                        </div>
+                    </div>
+
+                    <div className="card-resumo total">
+                        <div className="card-icon">
+                            <ClipboardList size={24} />
+                        </div>
+                        <div className="card-info">
+                            <span>Total de planos</span>
+                            <strong>{resumoGeral.totalPlanos}</strong>
                         </div>
                     </div>
 
@@ -168,16 +179,6 @@ export default function DashboardCoordenador() {
                         <div className="card-info">
                             <span>Planos concluídos</span>
                             <strong>{resumoGeral.totalConcluidos}</strong>
-                        </div>
-                    </div>
-
-                    <div className="card-resumo andamento">
-                        <div className="card-icon">
-                            <Clock3 size={24} />
-                        </div>
-                        <div className="card-info">
-                            <span>Em andamento</span>
-                            <strong>{resumoGeral.totalAndamento}</strong>
                         </div>
                     </div>
 
@@ -246,14 +247,34 @@ export default function DashboardCoordenador() {
                                         <span className="legenda-fracao">planos concluídos</span>
                                     </div>
 
-                                    <div className="barra-progresso-wrap">
-                                        <div className="barra-progresso">
-                                            <div
-                                                className="barra-progresso-fill"
-                                                style={{ width: `${Number(professor.percentual || 0)}%` }}
+                                    <div
+                                        className={`progresso-circular ${
+                                            Number(professor.total || 0) > 0 &&
+                                            Number(professor.concluidos || 0) === Number(professor.total || 0)
+                                                ? "finalizado"
+                                                : Number(professor.concluidos || 0) > 0
+                                                    ? "em-andamento"
+                                                    : "pendente"
+                                        }`}
+                                        style={{ "--percentual": Number(professor.percentual || 0) }}
+                                    >
+                                        <svg viewBox="0 0 44 44" aria-hidden="true">
+                                            <defs>
+                                                <linearGradient id="gradiente-acompanhamento" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                    <stop offset="0%" stopColor="#f59e0b" />
+                                                    <stop offset="100%" stopColor="#ea580c" />
+                                                </linearGradient>
+                                            </defs>
+                                            <circle className="progresso-circular-bg" cx="22" cy="22" r="18" />
+                                            <circle
+                                                className="progresso-circular-fill"
+                                                cx="22"
+                                                cy="22"
+                                                r="18"
+                                                pathLength="100"
                                             />
-                                        </div>
-                                        <span className="percentual-texto">{Number(professor.percentual || 0)}%</span>
+                                        </svg>
+                                        <span>{Number(professor.percentual || 0)}%</span>
                                     </div>
 
                                     {/* 
@@ -446,39 +467,37 @@ export default function DashboardCoordenador() {
 
                 <nav className="sidebar-nav">
                     <button
-                        className={`nav-item ${menuAtivo === "inicio" ? "ativo" : ""}`}
+                        className={`nav-item ${location.pathname === "/planos" ? "ativo" : ""}`}
                         onClick={() => {
-                            setMenuAtivo("inicio");
-                            setMobileMenuAberto(false);
+                            navegarMenu("/planos");
                         }}
-                        title="Início"
+                        title="Planos"
                     >
-                        <Home size={20} />
-                        {mostrarTexto && <span>Início</span>}
+                        <BookOpenCheck size={20} />
+                        {mostrarTexto && <span>Planos</span>}
                     </button>
 
                     <button
-                        className={`nav-item ${menuAtivo === "perfil" ? "ativo" : ""}`}
+                        className={`nav-item ${location.pathname === "/dashboard-coordenador" && menuAtivo === "acompanhamento" ? "ativo" : ""}`}
                         onClick={() => {
-                            setMenuAtivo("perfil");
-                            setMobileMenuAberto(false);
+                            setMenuAtivo("acompanhamento");
+                            navegarMenu("/dashboard-coordenador");
                         }}
-                        title="Perfil"
+                        title="Acompanhamento"
                     >
-                        <User size={20} />
-                        {mostrarTexto && <span>Perfil</span>}
+                        <LayoutDashboard size={20} />
+                        {mostrarTexto && <span>Acompanhamento</span>}
                     </button>
 
                     <button
-                        className={`nav-item ${menuAtivo === "sobre" ? "ativo" : ""}`}
+                        className={`nav-item ${location.pathname === "/professores-cadastrados" ? "ativo" : ""}`}
                         onClick={() => {
-                            setMenuAtivo("sobre");
-                            setMobileMenuAberto(false);
+                            navegarMenu("/professores-cadastrados");
                         }}
-                        title="Sobre"
+                        title="Usuários"
                     >
-                        <Info size={20} />
-                        {mostrarTexto && <span>Sobre</span>}
+                        <ClipboardList size={20} />
+                        {mostrarTexto && <span>Usuários</span>}
                     </button>
 
                     <button

@@ -16,7 +16,6 @@ import {
   BookText,
   BookCheck,
   Layers3,
-  Camera,
   ImageUp
 } from "lucide-react";
 import "./painelProfessor.css";
@@ -387,7 +386,7 @@ export default function AbaProfessor() {
 
           <div className="perfil-foto-info">
             <strong>Foto do perfil</strong>
-            <span>Envie uma imagem ou tire uma foto pelo celular.</span>
+            <span>Envie uma imagem para atualizar sua foto.</span>
             {erroFoto && <p className="foto-erro">{erroFoto}</p>}
           </div>
 
@@ -398,18 +397,6 @@ export default function AbaProfessor() {
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
-                onChange={handleFotoChange}
-                disabled={enviandoFoto}
-              />
-            </label>
-
-            <label className="foto-btn secundario">
-              <Camera size={18} />
-              <span>Tirar foto</span>
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                capture="user"
                 onChange={handleFotoChange}
                 disabled={enviandoFoto}
               />

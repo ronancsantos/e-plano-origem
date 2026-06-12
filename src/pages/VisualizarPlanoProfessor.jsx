@@ -1,22 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { buscarPlanoProfessor, buscarPlano, listarBNCC } from "../services/api";
+import { buscarPlanoProfessor, buscarPlano, buscarProfessor, listarBNCC } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { ArrowLeft, Download, Printer } from "lucide-react";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import "./visualizarProf.css";
 
 export default function VisualizarPlanoProfessor() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { usuario } = useAuth();
-    const documentoRef = useRef(null);
 
     const [loading, setLoading] = useState(true);
     const [salvandoPdf, setSalvandoPdf] = useState(false);
+    const [imprimindoPdf, setImprimindoPdf] = useState(false);
     const [plano, setPlano] = useState(null);
     const [modelo, setModelo] = useState(null);
+    const [professorDetalhe, setProfessorDetalhe] = useState(null);
     const [bncc, setBncc] = useState({});
 
     useEffect(() => {
@@ -24,9 +24,11 @@ export default function VisualizarPlanoProfessor() {
             try {
                 const modeloData = await buscarPlano(id);
                 const planoData = await buscarPlanoProfessor(usuario.id, id);
+                const professorData = await buscarProfessor(usuario.id);
 
                 setModelo(modeloData);
                 setPlano(planoData);
+                setProfessorDetalhe(professorData);
 
                 const base = planoData || modeloData;
 
@@ -74,16 +76,53 @@ export default function VisualizarPlanoProfessor() {
 
     const chMensal = componentesCH25.includes(dados.componente) ? 25 : "-";
 
-    const estabelecimento =
-        dados.escola ||
-        usuario?.escola ||
-        "Estabelecimento de Ensino";
-
     const professorNome = (usuario?.nome || "-").toUpperCase();
     const emailProfessor = usuario?.email || "-";
 
     const componenteCurricular =
         nomeComponente[dados.componente] || dados.componente || "-";
+
+    function normalizarTexto(valor) {
+        return String(valor || "")
+            .toLowerCase()
+            .replace(/_/g, " ")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, " ")
+            .trim();
+    }
+
+    function normalizarAno(valor) {
+        const numero = String(valor || "").match(/\d+/)?.[0] || "";
+        return numero.trim();
+    }
+
+    const escolasDocumento = (() => {
+        const componentePlano = normalizarTexto(componenteCurricular);
+        const anoPlano = normalizarAno(dados.ano);
+        const escolasMap = new Map();
+
+        (professorDetalhe?.atribuicoes || []).forEach((atribuicao) => {
+            const componenteAtribuicao = normalizarTexto(atribuicao.componente_nome);
+            const anoAtribuicao = normalizarAno(atribuicao.turma_ano || atribuicao.turma_nome);
+
+            if (
+                componenteAtribuicao === componentePlano &&
+                anoAtribuicao === anoPlano &&
+                atribuicao.escola_nome
+            ) {
+                escolasMap.set(atribuicao.escola_id || atribuicao.escola_nome, atribuicao.escola_nome);
+            }
+        });
+
+        const escolas = Array.from(escolasMap.values());
+
+        return escolas.length > 0
+            ? escolas
+            : [dados.escola || usuario?.escola || "Estabelecimento de Ensino"];
+    })();
+
+    const estabelecimento = escolasDocumento[0];
 
     function montarMapaHabilidades() {
         const mapa = {};
@@ -126,53 +165,243 @@ export default function VisualizarPlanoProfessor() {
         navigate(-1);
     }
 
-    function imprimirPlano() {
-        window.print();
+    function gerarNomeArquivoPdf() {
+        return `plano_${componenteCurricular}_${dados.ano || ""}`
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]+/g, "_")
+            .replace(/^_|_$/g, "") || "plano_professor";
+    }
+
+    function gerarDocumentoPdf() {
+        const pdf = new jsPDF("p", "mm", "a4");
+        const paginaLargura = pdf.internal.pageSize.getWidth();
+        const paginaAltura = pdf.internal.pageSize.getHeight();
+        const margemX = 15;
+        const margemTopo = 14;
+        const margemRodape = 14;
+        const larguraConteudo = paginaLargura - margemX * 2;
+        const verde = [15, 118, 110];
+        const cinzaBorda = [219, 231, 228];
+        const textoEscuro = [31, 41, 55];
+        const textoClaro = [100, 116, 139];
+        let y = margemTopo;
+
+        function textoSeguro(valor) {
+            if (valor === null || valor === undefined || valor === "") return "-";
+            return String(valor);
+        }
+
+        function novaPagina() {
+            pdf.addPage();
+            y = margemTopo;
+        }
+
+        function garantirEspaco(alturaNecessaria) {
+            if (y + alturaNecessaria > paginaAltura - margemRodape) {
+                novaPagina();
+            }
+        }
+
+        function textoQuebrado(texto, largura) {
+            return pdf.splitTextToSize(textoSeguro(texto), largura);
+        }
+
+        function adicionarTituloDocumento() {
+            pdf.setFillColor(...verde);
+            pdf.rect(margemX, y, larguraConteudo, 12, "F");
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(13);
+            pdf.text("PLANO DE ATIVIDADE DOCENTE", paginaLargura / 2, y + 8, {
+                align: "center"
+            });
+            y += 18;
+        }
+
+        function adicionarCampo(rotulo, valor) {
+            pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(9);
+            const linhas = textoQuebrado(`${rotulo}: ${textoSeguro(valor)}`, larguraConteudo - 8);
+            const altura = Math.max(9, linhas.length * 4.6 + 5);
+
+            garantirEspaco(altura);
+            pdf.setDrawColor(...cinzaBorda);
+            pdf.setFillColor(248, 251, 250);
+            pdf.rect(margemX, y, larguraConteudo, altura, "FD");
+            pdf.setTextColor(...textoEscuro);
+            pdf.text(linhas, margemX + 4, y + 6);
+            y += altura;
+        }
+
+        function adicionarCabecalho(escolaNome) {
+            adicionarCampo("Estabelecimento de Ensino", escolaNome);
+            adicionarCampo("Ano / Periodo / CH Mensal", `${dados.ano || "-"} / ${dados.periodo || "-"} / ${chMensal}`);
+            adicionarCampo("Professor", professorNome);
+            adicionarCampo("E-mail", emailProfessor);
+            adicionarCampo("Componente Curricular", componenteCurricular);
+            y += 8;
+        }
+
+        function adicionarSecao(titulo, itens) {
+            const lista = Array.isArray(itens) && itens.length > 0 ? itens : ["-"];
+
+            garantirEspaco(18);
+            pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(10.5);
+            pdf.setTextColor(...verde);
+            pdf.text(titulo, margemX, y);
+            y += 3;
+            pdf.setDrawColor(...verde);
+            pdf.setLineWidth(0.25);
+            pdf.line(margemX, y, paginaLargura - margemX, y);
+            y += 6;
+
+            pdf.setFont("helvetica", "normal");
+            pdf.setFontSize(10);
+            pdf.setTextColor(...textoEscuro);
+
+            lista.forEach((item) => {
+                const linhas = textoQuebrado(textoSeguro(item), larguraConteudo - 8);
+                garantirEspaco(Math.min(linhas.length, 2) * 5 + 2);
+
+                linhas.forEach((linha, index) => {
+                    garantirEspaco(5);
+                    if (index === 0 && item !== "-") {
+                        pdf.text("•", margemX + 2, y);
+                    }
+                    pdf.text(linha, margemX + 7, y);
+                    y += 5;
+                });
+
+                y += 1.5;
+            });
+
+            y += 4;
+        }
+
+        function adicionarAssinaturas() {
+            const alturaBloco = 38;
+            const espacoEntre = 10;
+            const larguraAssinatura = (larguraConteudo - espacoEntre) / 2;
+            const assinaturas = [
+                "Professor(a)",
+                "Coordenação Pedagógica"
+            ];
+
+            garantirEspaco(alturaBloco + 8);
+            y += 4;
+
+            pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(10.5);
+            pdf.setTextColor(...verde);
+            pdf.text("ASSINATURAS", margemX, y);
+            y += 24;
+
+            assinaturas.forEach((assinatura, index) => {
+                const x = margemX + index * (larguraAssinatura + espacoEntre);
+
+                pdf.setDrawColor(100, 116, 139);
+                pdf.setLineWidth(0.25);
+                pdf.line(x, y, x + larguraAssinatura, y);
+
+                pdf.setFont("helvetica", "normal");
+                pdf.setFontSize(8.5);
+                pdf.setTextColor(...textoClaro);
+                pdf.text(assinatura, x + larguraAssinatura / 2, y + 5, {
+                    align: "center"
+                });
+            });
+
+            y += 14;
+        }
+
+        function adicionarRodapes() {
+            const totalPaginas = pdf.getNumberOfPages();
+
+            for (let pagina = 1; pagina <= totalPaginas; pagina += 1) {
+                pdf.setPage(pagina);
+                pdf.setDrawColor(...cinzaBorda);
+                pdf.line(margemX, paginaAltura - 10, paginaLargura - margemX, paginaAltura - 10);
+                pdf.setFont("helvetica", "normal");
+                pdf.setFontSize(8);
+                pdf.setTextColor(...textoClaro);
+                pdf.text(
+                    `Página ${pagina} de ${totalPaginas}`,
+                    paginaLargura / 2,
+                    paginaAltura - 5,
+                    { align: "center" }
+                );
+            }
+        }
+
+        escolasDocumento.forEach((escolaNome, index) => {
+            if (index > 0) {
+                novaPagina();
+            }
+
+            adicionarTituloDocumento();
+            adicionarCabecalho(escolaNome);
+            adicionarSecao("DESCRITORES", descritoresLista);
+            adicionarSecao("CAMPO DE ATUAÇÃO", [dados.campo_atuacao || "-"]);
+            adicionarSecao("PRÁTICAS DE LINGUAGEM", [componenteCurricular]);
+            adicionarSecao("GÊNEROS SUGERIDOS", generosLista);
+            adicionarSecao(
+                "HABILIDADES",
+                habilidadesFormatadas.map((item) => `(${item.codigo}) ${item.descricao}`)
+            );
+            adicionarSecao("OBJETOS DE CONHECIMENTO", objetosLista);
+            adicionarSecao("METODOLOGIA", metodologiasLista);
+            adicionarSecao("RECURSOS USADOS NA ABORDAGEM DO CONHECIMENTO", recursosMetodologiaLista);
+            adicionarSecao("INSTRUMENTOS AVALIATIVOS", instrumentosLista);
+            adicionarSecao("RECURSOS USADOS NA MENSURAÇÃO DA APRENDIZAGEM", recursosAvaliacaoLista);
+            adicionarSecao("CRITÉRIOS AVALIATIVOS", tiposAvaliacaoLista);
+            adicionarSecao("OBSERVAÇÕES", dados.observacoes ? [dados.observacoes] : []);
+            adicionarAssinaturas();
+        });
+
+        adicionarRodapes();
+
+        return pdf;
     }
 
     async function salvarPdf() {
-        if (!documentoRef.current || salvandoPdf) return;
+        if (salvandoPdf) return;
 
         setSalvandoPdf(true);
 
         try {
-            const canvas = await html2canvas(documentoRef.current, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: "#ffffff"
-            });
-
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF("p", "mm", "a4");
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-            const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-            let heightLeft = imgHeight;
-            let position = 0;
-
-            pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
-            heightLeft -= pdfHeight;
-
-            while (heightLeft > 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
-                heightLeft -= pdfHeight;
-            }
-
-            const nomeArquivo = `plano_${componenteCurricular}_${dados.ano || ""}`
-                .toLowerCase()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
-                .replace(/[^a-z0-9]+/g, "_")
-                .replace(/^_|_$/g, "");
-
-            pdf.save(`${nomeArquivo || "plano_professor"}.pdf`);
+            const pdf = gerarDocumentoPdf();
+            pdf.save(`${gerarNomeArquivoPdf()}.pdf`);
         } catch (error) {
             console.error("Erro ao salvar PDF:", error);
             window.print();
         } finally {
             setSalvandoPdf(false);
+        }
+    }
+
+    async function imprimirPlano() {
+        if (imprimindoPdf) return;
+
+        setImprimindoPdf(true);
+
+        try {
+            const pdf = gerarDocumentoPdf();
+            pdf.autoPrint();
+
+            const pdfUrl = pdf.output("bloburl");
+            const janelaPdf = window.open(pdfUrl, "_blank");
+
+            if (!janelaPdf) {
+                pdf.save(`${gerarNomeArquivoPdf()}.pdf`);
+            }
+        } catch (error) {
+            console.error("Erro ao imprimir PDF:", error);
+            window.print();
+        } finally {
+            setImprimindoPdf(false);
         }
     }
 
@@ -197,14 +426,14 @@ export default function VisualizarPlanoProfessor() {
                     <span>{salvandoPdf ? "Salvando..." : "Salvar PDF"}</span>
                 </button>
 
-                <button className="btn-topo btn-imprimir" onClick={imprimirPlano}>
+                <button className="btn-topo btn-imprimir" onClick={imprimirPlano} disabled={imprimindoPdf}>
                     <Printer size={18} />
-                    <span>Imprimir</span>
+                    <span>{imprimindoPdf ? "Abrindo..." : "Imprimir"}</span>
                 </button>
             </div>
 
             <div className="a4-page">
-                <div className="plano-doc" ref={documentoRef}>
+                <div className="plano-doc">
                     <div className="topo-doc bloco-pequeno">
                         <div className="logo-central">
                             <img src="/logo.png" alt="Logo" />
@@ -408,6 +637,20 @@ export default function VisualizarPlanoProfessor() {
                                 ) : (
                                     "-"
                                 )}
+                            </div>
+                        </div>
+
+                        <div className="quadro-linha assinaturas-doc bloco-pequeno">
+                            <div className="campo-topico">ASSINATURAS</div>
+
+                            <div className="assinaturas-grid">
+                                <div className="assinatura-item">
+                                    <span>Professor(a)</span>
+                                </div>
+
+                                <div className="assinatura-item">
+                                    <span>Coordenação Pedagógica</span>
+                                </div>
                             </div>
                         </div>
                     </div>

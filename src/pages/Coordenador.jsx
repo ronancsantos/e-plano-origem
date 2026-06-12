@@ -7,14 +7,13 @@ import {
   atualizarPlano
 } from "../services/api";
 import "./coordenador.css";
-import { ChevronRight, CircleArrowRight, CircleArrowLeft, BookCheck, CircleAlert, CopyCheck, CopyX } from "lucide-react";
+import { ChevronRight, CircleArrowRight, CircleArrowLeft, Layer3, CircleAlert, CopyCheck, CopyX } from "lucide-react";
 import Toast from "./Toast";
 
 export default function Coordenador() {
   const [etapa, setEtapa] = useState(1);
   const [bncc, setBncc] = useState({});
   const [busca, setBusca] = useState("");
-  const [erro, setErro] = useState("");
   const [popup, setPopup] = useState({ show: false, mensagem: "", tipo: "" });
 
   const selecionarTodos = (campo, lista) => {
@@ -201,19 +200,91 @@ export default function Coordenador() {
 
     for (let campo of campos) {
       if (!modelo[campo.key]) {
-        setErro(`Preencha o campo ${campo.label}.`);
+        setPopup({
+          show: true,
+          mensagem: `Preencha o campo ${campo.label}.`,
+          tipo: "erro"
+        });
         return;
       }
     }
 
-    setErro("");
     setEtapa(2);
+  };
+
+  const etapasPlano = [
+    { numero: 1, label: "Dados iniciais" },
+    { numero: 2, label: "Habilidades" },
+    { numero: 3, label: "Objetos" },
+    { numero: 4, label: "Avaliação" },
+    { numero: 5, label: "Metodologia" }
+  ];
+
+  const etapaCompleta = (numero) => {
+    if (numero === 1) return Boolean(modelo.componente && modelo.ano && modelo.periodo);
+    if (numero === 2) return modelo.habilidades.length > 0;
+    if (numero === 3) return modelo.objetos.length > 0;
+    if (numero === 4) return modelo.instrumentos.length > 0 && modelo.recursosAvaliacao.length > 0;
+    if (numero === 5) return modelo.metodologias.length > 0 && modelo.recursosMetodologia.length > 0;
+    return false;
+  };
+
+  const mensagemEtapa = (numero) => {
+    if (numero === 1) return "Preencha componente, ano e período antes de avançar.";
+    if (numero === 2) return "Selecione pelo menos uma habilidade antes de avançar.";
+    if (numero === 3) return "Selecione pelo menos um objeto de conhecimento antes de avançar.";
+    if (numero === 4) return "Selecione instrumentos avaliativos e recursos de avaliação antes de avançar.";
+    if (numero === 5) return "Selecione metodologias e recursos de metodologia antes de finalizar.";
+    return "Preencha os campos obrigatórios antes de avançar.";
+  };
+
+  const etapaLiberada = (numero) => {
+    if (id || numero <= etapa) return true;
+
+    for (let atual = 1; atual < numero; atual += 1) {
+      if (!etapaCompleta(atual)) return false;
+    }
+
+    return true;
+  };
+
+  const avancarEtapa = (proximaEtapa) => {
+    if (!etapaCompleta(etapa)) {
+      setPopup({
+        show: true,
+        mensagem: mensagemEtapa(etapa),
+        tipo: "erro"
+      });
+      return;
+    }
+
+    setEtapa(proximaEtapa);
   };
 
   return (
     <div className="box">
 
-      <h1>{id ? "Editar Plano" : "Criar modelo do Plano"}</h1>
+      <div className="plano-form-header">
+        <div>
+          <span className="plano-form-kicker">Modelo de planejamento</span>
+          <h1>{id ? "Editar Plano" : "Criar modelo do Plano"}</h1>
+        </div>
+      </div>
+
+      <div className="etapas-plano" aria-label="Etapas da criação do plano">
+        {etapasPlano.map((item) => (
+          <button
+            key={item.numero}
+            type="button"
+            className={`etapa-pill ${etapa === item.numero ? "ativa" : ""} ${etapa > item.numero ? "concluida" : ""}`}
+            onClick={() => etapaLiberada(item.numero) && setEtapa(item.numero)}
+            disabled={!etapaLiberada(item.numero)}
+          >
+            <span>{item.numero}</span>
+            {item.label}
+          </button>
+        ))}
+      </div>
 
       {popup.show && (
         <Toast
@@ -260,13 +331,6 @@ export default function Coordenador() {
         </>
       )}
 
-      <Toast
-        key={erro}
-        mensagem={erro}
-        tipo="erro"
-        onClose={() => setErro("")}
-      />
-
       {etapa === 2 && (
         <>
           <h2>Habilidades</h2>
@@ -298,7 +362,7 @@ export default function Coordenador() {
 
           <div className="acoes">
             <button className="btn btn-info" onClick={() => setEtapa(1)} ><CircleArrowLeft color="#ffffff" size={30} /></button>
-            <button className="btn btn-primary" onClick={() => setEtapa(3)}><CircleArrowRight color="#ffffff" size={30} /></button>
+            <button className="btn btn-primary" onClick={() => avancarEtapa(3)}><CircleArrowRight color="#ffffff" size={30} /></button>
           </div>
 
         </>
@@ -325,7 +389,7 @@ export default function Coordenador() {
 
           <div className="acoes">
             <button className="btn btn-info" onClick={() => setEtapa(2)} ><CircleArrowLeft color="#ffffff" size={30} /></button>
-            <button className="btn btn-primary" onClick={() => setEtapa(4)}><CircleArrowRight color="#ffffff" size={30} /></button>
+            <button className="btn btn-primary" onClick={() => avancarEtapa(4)}><CircleArrowRight color="#ffffff" size={30} /></button>
           </div>
         </>
       )}
@@ -355,7 +419,7 @@ export default function Coordenador() {
 
           <div className="acoes">
             <button className="btn btn-info" onClick={() => setEtapa(3)} ><CircleArrowLeft color="#ffffff" size={30} /></button>
-            <button className="btn btn-primary" onClick={() => setEtapa(5)}><CircleArrowRight color="#ffffff" size={30} /></button>
+            <button className="btn btn-primary" onClick={() => avancarEtapa(5)}><CircleArrowRight color="#ffffff" size={30} /></button>
           </div>
         </>
       )}
@@ -385,7 +449,7 @@ export default function Coordenador() {
           <button className="btn btn-success" onClick={() => setModelo({ ...modelo, recursosMetodologia: recursosMetodologia })}><CopyCheck color="#ffff" size={15}/>Selecionar todos</button>
           <button className="btn btn-danger" onClick={() => setModelo({ ...modelo, recursosMetodologia: [] })}><CopyX color="#ffff" size={15}/>Desmarcar todos</button>
 
-          <button className="btn btn-primary btn-right btn-margem" onClick={handleSalvar}><BookCheck color="#ffff" size={20} />FINALIZAR</button>
+          <button className="btn btn-primary btn-right btn-margem" onClick={handleSalvar}><Layer3 color="#ffff" size={20} />FINALIZAR</button>
           
         </>
       )}

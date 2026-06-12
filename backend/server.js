@@ -361,6 +361,7 @@ app.get("/professores", async (req, res) => {
     const escolasMap = new Map((escolas || []).map((item) => [item.id, item.nome]));
     const componentesMap = new Map((componentes || []).map((item) => [item.id, item.nome]));
     const turmasMap = new Map((turmas || []).map((item) => [item.id, `${item.ano} - Turma ${item.turma}`]));
+    const turmasAnoMap = new Map((turmas || []).map((item) => [item.id, item.ano]));
 
     const mapa = new Map();
     (professores || []).forEach((professor) => {
@@ -384,6 +385,7 @@ app.get("/professores", async (req, res) => {
         componente_id: atuacao.componente_id,
         componente_nome: componentesMap.get(atuacao.componente_id) || "",
         turma_id: atuacao.turma_id,
+        turma_ano: turmasAnoMap.get(atuacao.turma_id) || "",
         turma_nome: turmasMap.get(atuacao.turma_id) || ""
       });
     });
@@ -414,6 +416,7 @@ app.get("/professores/:id", async (req, res) => {
     const escolasMap = new Map((escolas || []).map((item) => [item.id, item.nome]));
     const componentesMap = new Map((componentes || []).map((item) => [item.id, item.nome]));
     const turmasMap = new Map((turmas || []).map((item) => [item.id, `${item.ano} - Turma ${item.turma}`]));
+    const turmasAnoMap = new Map((turmas || []).map((item) => [item.id, item.ano]));
 
     res.json({
       id: professor.id,
@@ -428,6 +431,7 @@ app.get("/professores/:id", async (req, res) => {
         componente_id: atuacao.componente_id,
         componente_nome: componentesMap.get(atuacao.componente_id) || "",
         turma_id: atuacao.turma_id,
+        turma_ano: turmasAnoMap.get(atuacao.turma_id) || "",
         turma_nome: turmasMap.get(atuacao.turma_id) || ""
       }))
     });

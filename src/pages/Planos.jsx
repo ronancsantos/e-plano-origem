@@ -112,13 +112,8 @@ export default function Planos() {
     carregar();
   }, []);
 
-  const { usuario, logout } = useAuth();
+  const { usuario } = useAuth();
   const navigate = useNavigate();
-
-  function sair() {
-    logout();
-    navigate("/login");
-  }
 
   const handleDelete = async () => {
     try {
@@ -186,13 +181,8 @@ export default function Planos() {
       <div className="planos-container">
         <div className="topo">
           <h1>Planos</h1>
-          <p>Olá, {usuario?.nome}</p>
 
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button onClick={sair}>Sair</button>
-          </div>
-
-          <button className="btn-novo" onClick={() => navigate("/coordenador")}>
+          <button className="btn-novo" onClick={() => navigate("/coordenador/novo-plano")}>
             Novo Plano
           </button>
         </div>
@@ -212,12 +202,12 @@ export default function Planos() {
             <tbody>
               {planos.map((p) => (
                 <tr key={p.id}>
-                  <td>{nomesComponentes[p.componente] || p.componente}</td>
-                  <td>{p.ano}</td>
-                  <td>
+                  <td data-label="Componente">{nomesComponentes[p.componente] || p.componente}</td>
+                  <td data-label="Ano">{p.ano}</td>
+                  <td data-label="Período">
                     {nomePeriodo.find((np) => np.value === String(p.periodo))?.label || ""}
                   </td>
-                  <td>
+                  <td data-label="Status">
                     <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                       <span
                         style={{
@@ -254,7 +244,7 @@ export default function Planos() {
                     </div>
                   </td>
 
-                  <td className="acoes">
+                  <td className="acoes" data-label="Ações">
                     <button onClick={() => navigate(`/visualizar/${p.id}`)}>
                       <Eye size={25} />
                     </button>

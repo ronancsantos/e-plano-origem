@@ -255,6 +255,33 @@
   margin-bottom: 0;
 }
 
+.assinaturas-doc {
+  padding-top: 22px;
+  padding-bottom: 24px;
+}
+
+.assinaturas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  padding-top: 22px;
+}
+
+.assinatura-item {
+  min-height: 42px;
+  border-top: 1px solid #64748b;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.assinatura-item span {
+  display: block;
+  padding-top: 7px;
+}
+
 .bloco-pequeno {
   break-inside: avoid;
   page-break-inside: avoid;
@@ -275,7 +302,8 @@
   }
 
   .linha-dupla,
-  .linha-tripla {
+  .linha-tripla,
+  .assinaturas-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -412,5 +440,22 @@
 
   .lista-bolinha {
     padding-left: 16px !important;
+  }
+
+  .assinaturas-doc {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    padding-top: 16px !important;
+    padding-bottom: 18px !important;
+  }
+
+  .assinaturas-grid {
+    gap: 12px !important;
+    padding-top: 20px !important;
+  }
+
+  .assinatura-item {
+    min-height: 34px !important;
+    font-size: 9px !important;
   }
 }

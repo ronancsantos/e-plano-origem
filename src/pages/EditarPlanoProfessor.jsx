@@ -82,6 +82,7 @@ export default function EditarPlanoProfessor() {
     ];
 
     const opcoesDescritores = [
+        "Não se aplica",
         "D1 - Localizar informações explícitas em um texto.",
         "D2 - Estabelecer relações entre partes de um texto, identificando repetições ou substituições que contribuem para a continuidade de um texto.",
         "D3 - Inferir o sentido de uma palavra ou expressão.",

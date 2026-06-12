@@ -222,72 +222,129 @@ body {
 /* CARDS TOPO */
 .cards-grid {
   display: grid;
-  gap: 18px;
-  margin-bottom: 24px;
+  gap: 24px;
+  margin-bottom: 26px;
 }
 
 .cards-grid-top {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .card-resumo {
-  background: #fff;
-  border-radius: 22px;
-  padding: 22px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
   display: flex;
   align-items: center;
   gap: 16px;
-  border: 1px solid #eef2f7;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 118px;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  padding: 20px 22px;
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.06);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .card-resumo:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.1);
+  border-color: rgba(255, 255, 255, 0.42);
+  box-shadow: 0 22px 44px rgba(15, 23, 42, 0.09);
+  transform: translateY(-2px);
 }
 
 .card-icon {
-  width: 58px;
-  height: 58px;
-  border-radius: 18px;
   display: flex;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  border-radius: 16px;
+}
+
+.card-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2.2;
+}
+
+.card-info {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .card-info span {
   display: block;
-  font-size: 14px;
-  color: #64748b;
-  margin-bottom: 6px;
+  max-width: 240px;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
 }
 
 .card-info strong {
-  font-size: 28px;
-  color: #0f172a;
-  font-weight: 800;
+  color: #ffffff;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 .card-resumo.total .card-icon {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: transparent;
+  color: #ffffff;
+}
+
+.card-resumo.professores-dia .card-icon {
+  background: transparent;
+  color: #ffffff;
 }
 
 .card-resumo.concluido .card-icon {
-  background: #dcfce7;
-  color: #16a34a;
+  background: transparent;
+  color: #ffffff;
 }
 
 .card-resumo.andamento .card-icon {
-  background: #fef3c7;
-  color: #d97706;
+  background: transparent;
+  color: #ffffff;
 }
 
 .card-resumo.pendente .card-icon {
-  background: #fee2e2;
-  color: #dc2626;
+  background: transparent;
+  color: #ffffff;
+}
+
+.card-resumo.total {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.card-resumo.professores-dia {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.card-resumo.concluido {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.card-resumo.andamento {
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+}
+
+.card-resumo.pendente {
+  background: linear-gradient(135deg, #ff5858, #f52121);
+}
+
+.card-resumo.professores-dia,
+.card-resumo.total {
+  grid-column: span 3;
+}
+
+.card-resumo.concluido,
+.card-resumo.pendente {
+  grid-column: span 3;
 }
 
 /* PAINEL */
@@ -301,7 +358,7 @@ body {
 }
 
 .painel-header {
-  display: flex;
+  display: none;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 18px;
@@ -364,28 +421,37 @@ body {
 /* GRID PROFESSORES */
 .professores-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 18px;
+  grid-template-columns: 1fr;
+  gap: 14px;
 }
 
 .professor-card {
-  background: #f8fafc;
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(140px, auto) minmax(104px, auto);
+  align-items: center;
+  gap: 18px;
   border: 1px solid #e9eef5;
-  border-radius: 22px;
-  padding: 20px;
-  transition: 0.2s ease;
+  border-radius: 18px;
+  padding: 16px 18px;
+  background: #ffffff;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .professor-card:hover {
+  border-color: #dbeafe;
   transform: translateY(-3px);
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 }
 
 .professor-card-topo {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 18px;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: 0;
 }
 
 .avatar-professor {
@@ -407,9 +473,11 @@ body {
 }
 
 .professor-info h3 {
-  font-size: 18px;
+  margin: 0 0 8px;
   color: #0f172a;
-  margin-bottom: 4px;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.25;
   word-break: break-word;
   text-align: start;
 }
@@ -420,12 +488,13 @@ body {
 }
 
 .progresso-central {
-  background: #ffffff;
+  min-width: 140px;
   border: 1px solid #e6edf5;
-  border-radius: 18px;
-  padding: 18px;
+  border-radius: 16px;
+  padding: 12px 16px;
+  background: #f8fafc;
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 0;
 }
 
 .progresso-fracao {
@@ -436,20 +505,20 @@ body {
 }
 
 .numero-atual {
-  font-size: 42px;
+  font-size: 30px;
   line-height: 1;
   font-weight: 900;
   color: #16a34a;
 }
 
 .barra-fracao {
-  font-size: 30px;
+  font-size: 22px;
   font-weight: 800;
   color: #94a3b8;
 }
 
 .numero-total {
-  font-size: 34px;
+  font-size: 26px;
   line-height: 1;
   font-weight: 800;
   color: #0f172a;
@@ -457,39 +526,66 @@ body {
 
 .legenda-fracao {
   display: block;
-  margin-top: 10px;
-  font-size: 13px;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: #64748b;
 }
 
-.barra-progresso-wrap {
+.progresso-circular {
+  position: relative;
   display: flex;
+  width: 92px;
+  height: 92px;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
+  justify-content: center;
+  justify-self: end;
 }
 
-.barra-progresso {
-  flex: 1;
-  height: 10px;
-  background: #e2e8f0;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.barra-progresso-fill {
+.progresso-circular svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #16a34a, #22c55e);
-  border-radius: 999px;
-  transition: width 0.4s ease;
+  transform: rotate(-90deg);
 }
 
-.percentual-texto {
-  min-width: 42px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #334155;
-  text-align: right;
+.progresso-circular-bg,
+.progresso-circular-fill {
+  fill: none;
+  stroke-width: 4.5;
+}
+
+.progresso-circular-bg {
+  stroke: #e2e8f0;
+}
+
+.progresso-circular-fill {
+  stroke: #dc2626;
+  stroke-linecap: round;
+  stroke-dasharray: var(--percentual) 100;
+  transition: stroke-dasharray 0.4s ease;
+}
+
+.progresso-circular.finalizado .progresso-circular-fill {
+  stroke: #16a34a;
+}
+
+.progresso-circular.em-andamento .progresso-circular-fill {
+  stroke: url("#gradiente-acompanhamento");
+}
+
+.progresso-circular.pendente .progresso-circular-fill {
+  stroke: #dc2626;
+}
+
+.progresso-circular span {
+  position: relative;
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 900;
 }
 
 .status-lista {
@@ -538,7 +634,7 @@ body {
 }
 
 .professor-footer {
-  margin-top: 6px;
+  margin-top: 0;
 }
 
 .tag-ok,
@@ -549,7 +645,7 @@ body {
   align-items: center;
   padding: 8px 12px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -619,6 +715,17 @@ body {
   .cards-grid-top {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .card-resumo {
+    min-height: 116px;
+  }
+
+  .card-resumo.professores-dia,
+  .card-resumo.total,
+  .card-resumo.concluido,
+  .card-resumo.pendente {
+    grid-column: auto;
+  }
 }
 
 @media (max-width: 860px) {
@@ -672,6 +779,18 @@ body {
   .mini-resumo {
     flex: 1;
   }
+
+  .professor-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .professor-card-topo {
+    grid-column: 1 / -1;
+  }
+
+  .progresso-circular {
+    justify-self: end;
+  }
 }
 
 @media (max-width: 640px) {
@@ -680,8 +799,27 @@ body {
   }
 
   .card-resumo {
-    padding: 18px;
+    min-height: 108px;
+    gap: 16px;
     border-radius: 18px;
+    padding: 18px;
+  }
+
+  .card-icon {
+    width: 52px;
+    height: 52px;
+    flex-basis: 52px;
+    border-radius: 16px;
+  }
+
+  .card-icon svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .card-info span {
+    margin-bottom: 8px;
+    font-size: 15px;
   }
 
   .painel-planos {
@@ -699,18 +837,28 @@ body {
   }
 
   .card-info strong {
-    font-size: 24px;
+    font-size: 30px;
   }
 
   .professor-card {
+    grid-template-columns: 1fr;
+    gap: 14px;
     padding: 16px;
   }
 
   .numero-atual {
-    font-size: 36px;
+    font-size: 30px;
   }
 
   .numero-total {
-    font-size: 30px;
+    font-size: 26px;
+  }
+
+  .progresso-central {
+    width: 100%;
+  }
+
+  .progresso-circular {
+    justify-self: center;
   }
 }
