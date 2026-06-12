@@ -1,16 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { buscarPlanoProfessor, buscarPlano, listarBNCC } from "../services/api";
 import { useAuth } from "../context/AuthContext";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, Download, Printer } from "lucide-react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import "./visualizarProf.css";
 
 export default function VisualizarPlanoProfessor() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { usuario } = useAuth();
+    const documentoRef = useRef(null);
 
     const [loading, setLoading] = useState(true);
+    const [salvandoPdf, setSalvandoPdf] = useState(false);
     const [plano, setPlano] = useState(null);
     const [modelo, setModelo] = useState(null);
     const [bncc, setBncc] = useState({});
@@ -109,6 +113,7 @@ export default function VisualizarPlanoProfessor() {
         return Array.isArray(lista) && lista.length > 0 ? lista : [];
     }
 
+    const descritoresLista = listaEmArray(dados.descritores);
     const generosLista = listaEmArray(dados.generos);
     const objetosLista = listaEmArray(dados.objetos);
     const metodologiasLista = listaEmArray(dados.metodologias);
@@ -121,8 +126,54 @@ export default function VisualizarPlanoProfessor() {
         navigate(-1);
     }
 
-    function baixarPdf() {
+    function imprimirPlano() {
         window.print();
+    }
+
+    async function salvarPdf() {
+        if (!documentoRef.current || salvandoPdf) return;
+
+        setSalvandoPdf(true);
+
+        try {
+            const canvas = await html2canvas(documentoRef.current, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: "#ffffff"
+            });
+
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF("p", "mm", "a4");
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+            heightLeft -= pdfHeight;
+
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, "PNG", 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdfHeight;
+            }
+
+            const nomeArquivo = `plano_${componenteCurricular}_${dados.ano || ""}`
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]+/g, "_")
+                .replace(/^_|_$/g, "");
+
+            pdf.save(`${nomeArquivo || "plano_professor"}.pdf`);
+        } catch (error) {
+            console.error("Erro ao salvar PDF:", error);
+            window.print();
+        } finally {
+            setSalvandoPdf(false);
+        }
     }
 
     if (loading) {
@@ -141,14 +192,19 @@ export default function VisualizarPlanoProfessor() {
                     <span>Voltar</span>
                 </button>
 
-                <button className="btn-topo btn-imprimir" onClick={baixarPdf}>
+                <button className="btn-topo btn-salvar" onClick={salvarPdf} disabled={salvandoPdf}>
+                    <Download size={18} />
+                    <span>{salvandoPdf ? "Salvando..." : "Salvar PDF"}</span>
+                </button>
+
+                <button className="btn-topo btn-imprimir" onClick={imprimirPlano}>
                     <Printer size={18} />
-                    <span>Imprimir / Salvar</span>
+                    <span>Imprimir</span>
                 </button>
             </div>
 
             <div className="a4-page">
-                <div className="plano-doc">
+                <div className="plano-doc" ref={documentoRef}>
                     <div className="topo-doc bloco-pequeno">
                         <div className="logo-central">
                             <img src="/logo.png" alt="Logo" />
@@ -203,6 +259,15 @@ export default function VisualizarPlanoProfessor() {
 
                         <div className="quadro-linha bloco-pequeno">
                             <div className="bloco-destaque-doc">
+                                <div className="linha-cabecalho linha-unica bloco-destaque-linha">
+                                    <div className="bloco-coluna-unica">
+                                        <div className="rotulo">Descritores</div>
+                                        <div className="valor-bloco">
+                                            {descritoresLista.length > 0 ? descritoresLista.join(", ") : "-"}
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="linha-cabecalho linha-dupla bloco-destaque-linha">
                                     <div>
                                         <div className="rotulo">Campo de Atuação</div>
@@ -344,18 +409,6 @@ export default function VisualizarPlanoProfessor() {
                                     "-"
                                 )}
                             </div>
-                        </div>
-                    </div>
-
-                    <div className="assinaturas-area bloco-pequeno">
-                        <div className="assinatura-box">
-                            <div className="linha-assinatura"></div>
-                            <p>Assinatura do Supervisor(a) Pedagógico(a)</p>
-                        </div>
-
-                        <div className="assinatura-box">
-                            <div className="linha-assinatura"></div>
-                            <p>Assinatura do Professor(a)</p>
                         </div>
                     </div>
                 </div>

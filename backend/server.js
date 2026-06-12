@@ -26,7 +26,7 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: "8mb" }));
 app.use("/auth", authRoutes);
 
 const parsePeriodo = (p) => {
@@ -74,6 +74,29 @@ const inserirAtuacoesProfessor = async (professorId, atribuicoes) => {
 
   const { error } = await supabase.from("professor_atuacoes").insert(registros);
   return error;
+};
+
+const extensaoPorMime = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp"
+};
+
+const normalizarImagemBase64 = (imagemBase64, contentType) => {
+  const valor = String(imagemBase64 || "");
+  const dataUrlMatch = valor.match(/^data:(image\/(?:jpeg|png|webp));base64,(.+)$/);
+
+  if (dataUrlMatch) {
+    return {
+      contentType: dataUrlMatch[1],
+      base64: dataUrlMatch[2]
+    };
+  }
+
+  return {
+    contentType,
+    base64: valor
+  };
 };
 
 const normalizarTexto = (valor) =>
@@ -480,6 +503,83 @@ app.put("/professores/:id", async (req, res) => {
   }
 });
 
+app.put("/professores/:id/foto", async (req, res) => {
+  try {
+    const professorId = req.params.id;
+    const { imagemBase64, contentType } = req.body;
+
+    if (!imagemBase64) {
+      return res.status(400).json({ error: "Envie uma imagem para atualizar a foto." });
+    }
+
+    const imagem = normalizarImagemBase64(imagemBase64, contentType);
+    const tipo = imagem.contentType;
+    const extensao = extensaoPorMime[tipo];
+
+    if (!extensao) {
+      return res.status(400).json({ error: "Formato inválido. Use JPG, PNG ou WEBP." });
+    }
+
+    const buffer = Buffer.from(imagem.base64, "base64");
+    if (!buffer.length) {
+      return res.status(400).json({ error: "Imagem inválida." });
+    }
+
+    if (buffer.length > 5 * 1024 * 1024) {
+      return res.status(400).json({ error: "A imagem deve ter no máximo 5 MB." });
+    }
+
+    const { data: professorAtual, error: errProfessor } = await supabase
+      .from("professores")
+      .select("id,nome,email,turno,foto_perfil_path")
+      .eq("id", professorId)
+      .maybeSingle();
+
+    if (errProfessor) return supabaseError(res, errProfessor);
+    if (!professorAtual) return res.status(404).json({ error: "Professor não encontrado." });
+
+    const bucket = "professor-fotos";
+    const caminho = `${professorId}/perfil-${Date.now()}.${extensao}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(bucket)
+      .upload(caminho, buffer, {
+        contentType: tipo,
+        upsert: true
+      });
+
+    if (uploadError) return supabaseError(res, uploadError, "Erro ao enviar a foto.");
+
+    const { data: publicData } = supabase.storage.from(bucket).getPublicUrl(caminho);
+    const fotoUrl = publicData.publicUrl;
+
+    const { data: professorAtualizado, error: updateError } = await supabase
+      .from("professores")
+      .update({
+        foto_perfil_url: fotoUrl,
+        foto_perfil_path: caminho,
+        foto_perfil_atualizada_em: new Date().toISOString()
+      })
+      .eq("id", professorId)
+      .select("id,nome,email,turno,foto_perfil_url,foto_perfil_path,foto_perfil_atualizada_em")
+      .single();
+
+    if (updateError) return supabaseError(res, updateError, "Erro ao salvar a foto no cadastro.");
+
+    if (professorAtual.foto_perfil_path && professorAtual.foto_perfil_path !== caminho) {
+      await supabase.storage.from(bucket).remove([professorAtual.foto_perfil_path]);
+    }
+
+    return res.json({
+      ...professorAtualizado,
+      perfil: "professor",
+      tipo: "professor"
+    });
+  } catch (error) {
+    return supabaseError(res, error, "Erro ao atualizar foto do professor.");
+  }
+});
+
 app.delete("/professores/:id", async (req, res) => {
   try {
     const { error } = await supabase.from("professores").delete().eq("id", req.params.id);
@@ -589,6 +689,7 @@ app.get("/professores/:professorId/modelos/:modeloId/plano", async (req, res) =>
       instrumentos: parseJSON(data.instrumentos),
       instrumentos_recursos: parseJSON(data.instrumentos_recursos),
       tipos_avaliacao: parseJSON(data.tipos_avaliacao),
+      descritores: parseJSON(data.descritores),
       generos: parseJSON(data.generos)
     });
   } catch (error) {
@@ -700,6 +801,7 @@ app.post("/professores/:professorId/modelos/:modeloId/plano", async (req, res) =
       ano,
       periodo,
       campo_atuacao,
+      descritores,
       generos,
       habilidades,
       objetos,
@@ -727,6 +829,7 @@ app.post("/professores/:professorId/modelos/:modeloId/plano", async (req, res) =
       ano: ano || "",
       periodo: periodo || "",
       campo_atuacao: campo_atuacao || "",
+      descritores: JSON.stringify(descritores || []),
       generos: JSON.stringify(generos || []),
       habilidades: JSON.stringify(habilidades || []),
       objetos: JSON.stringify(objetos || []),

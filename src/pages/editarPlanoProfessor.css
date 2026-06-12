@@ -1,346 +1,487 @@
-/* ===== EDITAR PLANO PROFESSOR ===== */
-
-.box {
-    width: 95%;
-    max-width: 1200px;
-    margin: 30px auto;
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+.editar-plano-page {
+  width: 100vw;
+  min-height: 100svh;
+  margin-left: calc(50% - 50vw);
+  padding: clamp(18px, 4vw, 44px);
+  background: #eef4f3;
+  color: #0f172a;
+  text-align: left;
 }
 
-.box h1 {
-    margin-bottom: 10px;
-    color: #1f2937;
-    font-size: 28px;
+.editar-plano-page .editar-plano-card {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+  padding: clamp(22px, 4vw, 38px);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 24px 70px rgba(2, 6, 23, 0.1);
 }
 
-.box h2 {
-    margin-top: 25px;
-    margin-bottom: 12px;
-    color: #111827;
-    font-size: 20px;
+.editar-plano-page h1 {
+  margin: 0 0 16px;
+  color: #0f172a;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.08;
+  font-weight: 850;
+  letter-spacing: 0;
 }
 
-.box h3 {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    color: #374151;
-    font-size: 17px;
+.editar-plano-page h2 {
+  margin: 30px 0 14px;
+  color: #0f172a;
+  font-size: clamp(20px, 2.6vw, 26px);
+  line-height: 1.18;
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
-.box p {
-    color: #4b5563;
-    line-height: 1.5;
+.editar-plano-page h3 {
+  margin: 26px 0 12px;
+  color: #334155;
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
-.resumo-edicao {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    padding: 14px 18px;
-    border-radius: 12px;
-    margin-bottom: 20px;
+.editar-plano-page p {
+  color: #475569;
+  line-height: 1.6;
 }
 
-.resumo-edicao p {
-    margin: 0;
-    font-size: 14px;
-    color: #374151;
+.editar-plano-page .resumo-edicao {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 22px;
+  border: 1px solid #dbe7e4;
+  border-radius: 8px;
+  padding: 14px;
+  background: #f8fbfa;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 15px;
-    margin-bottom: 20px;
+.editar-plano-page .resumo-edicao p {
+  min-width: 0;
+  margin: 0;
+  border-left: 3px solid #0f766e;
+  padding: 4px 0 4px 10px;
+  color: #334155;
+  font-size: 14px;
 }
 
-.form-group {
-    margin-bottom: 18px;
+.editar-plano-page .resumo-edicao strong {
+  color: #0f172a;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: #374151;
-    font-weight: 600;
-    font-size: 14px;
+.editar-plano-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 26px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 22px;
 }
 
-select,
-input {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 12px;
-    outline: none;
-    font-size: 14px;
-    background: #fff;
-    transition: 0.2s;
+.editar-plano-intro > div {
+  max-width: 720px;
 }
 
-select:focus,
-input:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+.editar-plano-page form {
+  display: block;
 }
 
+.editar-plano-page .form-group {
+  min-width: 0;
+  margin-bottom: 18px;
+}
 
-.lista {
-    display: flex;
+.editar-plano-page .form-group > label {
+  display: block;
+  width: auto;
+  min-height: auto;
+  margin: 0 0 8px;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.35;
+  cursor: default;
+}
+
+.editar-plano-page select,
+.editar-plano-page input,
+.editar-plano-page textarea {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: 0;
+  background: #ffffff;
+  color: #0f172a;
+  font: inherit;
+  font-size: 15px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.editar-plano-page select,
+.editar-plano-page input {
+  min-height: 52px;
+  padding: 0 14px;
+}
+
+.editar-plano-page select {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editar-plano-page select:focus,
+.editar-plano-page input:focus,
+.editar-plano-page textarea:focus {
+  border-color: #0f766e;
+  background: #fbfefe;
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.14);
+}
+
+.editar-plano-page input::placeholder,
+.editar-plano-page textarea::placeholder {
+  color: #94a3b8;
+}
+
+.editar-plano-page .lista {
+  display: grid;
+  gap: 10px;
+  max-height: 390px;
+  margin: 14px 0;
+  overflow-y: auto;
+  border: 1px solid #dbe7e4;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f8fbfa;
+}
+
+.editar-plano-page .lista label,
+.editar-plano-page form > label {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  margin: 0 0 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+  color: #1f2937;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.editar-plano-page .lista label:hover,
+.editar-plano-page form > label:hover {
+  border-color: rgba(15, 118, 110, 0.36);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  transform: translateY(-1px);
+}
+
+.editar-plano-page input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 2px 0 0;
+  padding: 0;
+  border-radius: 5px;
+  accent-color: #0f766e;
+  transform: none;
+}
+
+.editar-plano-page .habilidade-codigo {
+  margin-right: 6px;
+  color: #0f766e;
+  font-weight: 850;
+}
+
+.editar-plano-page .habilidade-texto {
+  color: #1f2937;
+}
+
+.editar-plano-page .acoes,
+.editar-plano-page .form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.editar-plano-page .btn,
+.editar-plano-page .btn-voltar,
+.editar-plano-page .btn-add-turma {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 8px;
+  padding: 11px 16px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.editar-plano-page .btn:hover,
+.editar-plano-page .btn-voltar:hover,
+.editar-plano-page .btn-add-turma:hover {
+  transform: translateY(-1px);
+}
+
+.editar-plano-page .btn-primary,
+.editar-plano-page .btn-add-turma {
+  background: #0f766e;
+}
+
+.editar-plano-page .btn-primary:hover,
+.editar-plano-page .btn-add-turma:hover {
+  background: #115e59;
+  box-shadow: 0 14px 28px rgba(15, 118, 110, 0.22);
+}
+
+.editar-plano-page .btn-success {
+  margin: 8px 10px 0 0;
+  background: #15803d;
+}
+
+.editar-plano-page .btn-success:hover {
+  background: #166534;
+}
+
+.editar-plano-page .btn-danger {
+  margin-top: 8px;
+  background: #dc2626;
+}
+
+.editar-plano-page .btn-danger:hover {
+  background: #b91c1c;
+}
+
+.editar-plano-page .btn-info,
+.editar-plano-page .btn-voltar {
+  background: #475569;
+}
+
+.editar-plano-page .btn-info:hover,
+.editar-plano-page .btn-voltar:hover {
+  background: #334155;
+}
+
+.editar-plano-page .btn-right {
+  margin-left: auto;
+}
+
+.editar-plano-page .btn-margem {
+  margin-top: 20px;
+}
+
+.editar-plano-page .turma-builder {
+  display: grid;
+  gap: 14px;
+  margin: 14px 0;
+}
+
+.editar-plano-page .turma-builder-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.editar-plano-page .turma-btn-area {
+  display: flex;
+  align-items: flex-end;
+}
+
+.editar-plano-page .turma-builder-grid .form-group {
+  margin-bottom: 0;
+}
+
+.editar-plano-page .turma-builder-grid select {
+  height: 52px;
+}
+
+.editar-plano-page .turma-builder-grid .btn-add-turma {
+  height: 52px;
+  min-height: 52px;
+  white-space: nowrap;
+}
+
+.editar-plano-page .turmas-selecionadas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.editar-plano-page .turma-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #99f6e4;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #ecfdf5;
+  color: #115e59;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.editar-plano-page .btn-remover-turma {
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #dc2626;
+  cursor: pointer;
+}
+
+.editar-plano-page .btn-remover-turma:hover {
+  color: #b91c1c;
+}
+
+.editar-plano-page .turma-vazia {
+  width: 100%;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 12px;
+  color: #64748b;
+  font-size: 14px;
+  text-align: center;
+}
+
+.editar-plano-page .chat-input-wrap {
+  width: 100%;
+}
+
+.editar-plano-page .chat-input-area {
+  min-height: 116px;
+  max-height: 340px;
+  resize: vertical;
+  padding: 14px;
+  line-height: 1.55;
+}
+
+.editar-plano-page .progress-container {
+  width: 100%;
+  height: 12px;
+  margin-top: 32px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dbe7e4;
+}
+
+.editar-plano-page .progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+@media (max-width: 900px) {
+  .editar-plano-page {
+    padding: 16px;
+  }
+
+  .editar-plano-page .resumo-edicao {
+    grid-template-columns: 1fr;
+  }
+
+  .editar-plano-intro {
+    align-items: stretch;
     flex-direction: column;
-    gap: 10px;
-    margin: 15px 0;
-    max-height: 380px;
-    overflow-y: auto;
+  }
+
+  .editar-plano-page .btn-voltar {
+    width: 100%;
+  }
+
+  .editar-plano-page .turma-builder-grid,
+  .editar-plano-page .escola-builder-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .editar-plano-page .btn-add-turma,
+  .editar-plano-page .turma-btn-area {
+    width: 100%;
+  }
+
+  .editar-plano-page select {
+    font-size: 14px;
+    padding-right: 34px;
+  }
+}
+
+@media (max-width: 560px) {
+  .editar-plano-page {
     padding: 12px;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    background: #fafafa;
-}
+  }
 
-.lista label {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 14px;
-    color: #1f2937;
-    line-height: 1.45;
-    background: #fff;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid #f0f0f0;
-}
+  .editar-plano-page .editar-plano-card {
+    padding: 18px;
+  }
 
-.lista input[type="checkbox"] {
-    width: auto;
-    margin-top: 3px;
-    transform: scale(1.1);
-}
+  .editar-plano-page h1 {
+    font-size: 28px;
+  }
 
-.acoes {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    margin-top: 20px;
-    flex-wrap: wrap;
-}
+  .editar-plano-page .lista {
+    max-height: 320px;
+    padding: 10px;
+  }
 
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
-}
+  .editar-plano-page select,
+  .editar-plano-page input {
+    min-height: 48px;
+    padding-left: 12px;
+  }
 
-.btn {
-    border: none;
-    border-radius: 12px;
-    padding: 12px 18px;
-    cursor: pointer;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.2s;
-}
+  .editar-plano-page select {
+    font-size: 13px;
+    line-height: 1.25;
+  }
 
-.btn-primary {
-    background: #2563eb;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #1d4ed8;
-}
-
-.btn-success {
-    background: #16a34a;
-    color: white;
-    margin-right: 10px;
-    margin-top: 8px;
-}
-
-.btn-success:hover {
-    background: #15803d;
-}
-
-.btn-danger {
-    background: #dc2626;
-    color: white;
-    margin-top: 8px;
-}
-
-.btn-danger:hover {
-    background: #b91c1c;
-}
-
-.btn-info {
-    background: #6b7280;
-    color: white;
-}
-
-.btn-info:hover {
-    background: #4b5563;
-}
-
-.btn-voltar {
-    border: none;
-    border-radius: 12px;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #e5e7eb;
-    color: #374151;
-}
-
-.btn-voltar:hover {
-    background: #d1d5db;
-}
-
-.btn-right {
-    margin-left: auto;
-}
-
-.btn-margem {
-    margin-top: 20px;
-}
-
-.progress-container {
-    width: 100%;
-    height: 12px;
-    background: #e5e7eb;
-    border-radius: 999px;
-    overflow: hidden;
-    margin-top: 28px;
-}
-
-.progress-bar {
-    height: 100%;
-    border-radius: 999px;
-    transition: width 0.3s ease;
-}
-
-/* ===== BLOCO ESTILO PROFESSORES ===== */
-
-.turma-builder {
-    display: flex;
+  .editar-plano-page .acoes,
+  .editar-plano-page .form-actions {
+    align-items: stretch;
     flex-direction: column;
-    gap: 14px;
-    margin: 14px 0;
+  }
+
+  .editar-plano-page .btn,
+  .editar-plano-page .btn-success,
+  .editar-plano-page .btn-danger,
+  .editar-plano-page .btn-info,
+  .editar-plano-page .btn-primary {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .editar-plano-page .btn-right {
+    margin-left: 0;
+  }
 }
-
-.turma-builder-grid {
-    display: grid;
-    grid-template-columns: minmax(220px, 1fr) auto;
-    gap: 12px;
-    align-items: end;
-}
-
-.escola-builder-grid {
-    grid-template-columns: minmax(220px, 1fr) auto;
-}
-
-.turma-btn-area {
-    display: flex;
-    align-items: end;
-}
-
-.btn-add-turma {
-    border: none;
-    border-radius: 12px;
-    padding: 12px 16px;
-    cursor: pointer;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #2563eb;
-    color: white;
-    height: 46px;
-}
-
-.btn-add-turma:hover {
-    background: #1d4ed8;
-}
-
-.turmas-selecionadas {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.turma-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: #eff6ff;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
-    padding: 8px 12px;
-    border-radius: 999px;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.btn-remover-turma {
-    border: none;
-    background: transparent;
-    color: #dc2626;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    padding: 0;
-}
-
-.btn-remover-turma:hover {
-    color: #b91c1c;
-}
-
-.turma-vazia {
-    color: #6b7280;
-    font-size: 14px;
-    padding: 10px 0;
-}
-
-/* ===== HABILIDADES ===== */
-
-.habilidade-codigo {
-    font-weight: 700;
-    color: #1d4ed8;
-    margin-right: 6px;
-}
-
-.habilidade-texto {
-    color: #1f2937;
-}
-
-/* ===== RESPONSIVO ===== */
-
-@media (max-width: 768px) {
-    .box {
-        padding: 20px;
-    }
-
-    .turma-builder-grid,
-    .escola-builder-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .acoes {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .btn-right {
-        margin-left: 0;
-    }
-}
-

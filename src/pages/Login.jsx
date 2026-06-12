@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowRight, BookOpenCheck, LockKeyhole, Mail } from "lucide-react";
 import { loginUsuario } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import "./login.css";
@@ -58,40 +59,63 @@ export default function Login() {
 
   return (
     <div className="login-page">
-      <div className="login-card">
-        <h1>E-Plano</h1>
-        <p></p>
+      <section className="login-hero" aria-label="E-Plano">
+        
+        <h1>Planejamento pedagógico mais simples e organizado.</h1>
+        <p>
+          Acesse sua área para acompanhar planos, professores e rotinas da rede
+          de ensino.
+        </p>
+      </section>
 
+      <div className="login-card">
+        <div className="login-card-header">
+          <span className="login-card-kicker">Acesso ao sistema</span>
+          <h2>E-plano</h2>
+        </div>
         <form onSubmit={handleSubmit}>
           <div className="input-group">
-            <label>E-mail</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Digite seu e-mail"
-              value={form.email}
-              onChange={handleChange}
-            />
+            <label htmlFor="email">E-mail</label>
+            <div className="input-shell">
+              <Mail size={18} aria-hidden="true" />
+              <input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="Digite seu e-mail"
+                value={form.email}
+                onChange={handleChange}
+                autoComplete="email"
+              />
+            </div>
           </div>
 
           <div className="input-group">
-            <label>Senha</label>
-            <input
-              type="password"
-              name="senha"
-              placeholder="Digite sua senha"
-              value={form.senha}
-              onChange={handleChange}
-            />
+            <label htmlFor="senha">Senha</label>
+            <div className="input-shell">
+              <LockKeyhole size={18} aria-hidden="true" />
+              <input
+                id="senha"
+                type="password"
+                name="senha"
+                placeholder="Digite sua senha"
+                value={form.senha}
+                onChange={handleChange}
+                autoComplete="current-password"
+              />
+            </div>
           </div>
 
           {erro && <div className="erro-login">{erro}</div>}
 
           <button type="submit" className="btn-login" disabled={loading}>
-            {loading ? "Entrando..." : "Entrar"}
+            <span>{loading ? "Entrando..." : "Entrar"}</span>
+            <ArrowRight size={18} aria-hidden="true" />
           </button>
         </form>
       </div>
+
+      <p className="login-credit">Powered by RSantos Dev</p>
     </div>
   );
 }

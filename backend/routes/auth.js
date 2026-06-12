@@ -145,8 +145,36 @@ router.post("/login", async (req, res) => {
 // ============================
 // USUÁRIO LOGADO
 // ============================
-router.get("/me", autenticarToken, (req, res) => {
-  res.json(req.usuario);
+router.get("/me", autenticarToken, async (req, res) => {
+  try {
+    const perfil = req.usuario.perfil || req.usuario.tipo;
+    const tabela = perfil === "professor" ? "professores" : "usuarios";
+    const campos = perfil === "professor"
+      ? "id,nome,email,turno,foto_perfil_url,foto_perfil_path,foto_perfil_atualizada_em"
+      : "id,nome,email,perfil";
+
+    const { data, error } = await supabase
+      .from(tabela)
+      .select(campos)
+      .eq("id", req.usuario.id)
+      .maybeSingle();
+
+    if (error) {
+      return res.status(500).json({ erro: error.message });
+    }
+
+    if (!data) {
+      return res.status(404).json({ erro: "Usuário não encontrado." });
+    }
+
+    res.json({
+      ...data,
+      perfil: perfil === "professor" ? "professor" : data.perfil,
+      tipo: perfil === "professor" ? "professor" : data.perfil
+    });
+  } catch (error) {
+    res.status(500).json({ erro: error.message });
+  }
 });
 
 // ============================

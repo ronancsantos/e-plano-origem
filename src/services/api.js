@@ -110,6 +110,18 @@ export async function deletarProfessor(id) {
   return res.json();
 }
 
+export async function atualizarFotoProfessor(id, dados) {
+  const res = await fetch(`${API}/professores/${id}/foto`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(dados),
+  });
+
+  return res.json();
+}
+
 // ===============================
 // LISTAS AUXILIARES PROFESSORES
 // ===============================

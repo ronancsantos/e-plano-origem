@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Toast from "./Toast";
-import "./coordenador.css";
+import "./editarPlanoProfessor.css";
 
 export default function EditarPlanoProfessor() {
     const { id } = useParams();
@@ -36,6 +36,7 @@ export default function EditarPlanoProfessor() {
     const [bncc, setBncc] = useState({});
     const [busca, setBusca] = useState("");
     const [erro, setErro] = useState("");
+    const [novoDescritor, setNovoDescritor] = useState("");
     const [novoGenero, setNovoGenero] = useState("");
 
     const chaveEtapa = usuario?.id ? `plano_professor_etapa_${usuario.id}_${id}` : "";
@@ -46,6 +47,7 @@ export default function EditarPlanoProfessor() {
         ano: "",
         periodo: "",
         campo_atuacao: "",
+        descritores: [],
         generos: [],
         habilidades: [],
         objetos: [],
@@ -74,9 +76,33 @@ export default function EditarPlanoProfessor() {
     const camposAtuacao = [
         "Campo da vida cotidiana",
         "Campo artístico-literário",
-        "Campo das práticas de estudo e pesquisa",
-        "Campo jornalístico-midiático",
-        "Campo de atuação na vida pública"
+        "Campo das práticas de estudo e pesquisa e Artístico-literário",
+        "Campo jornalístico-midiático e Artístico-literário",
+        "Campo de atuação na vida pública e Artístico-literário"
+    ];
+
+    const opcoesDescritores = [
+        "D1 - Localizar informações explícitas em um texto.",
+        "D2 - Estabelecer relações entre partes de um texto, identificando repetições ou substituições que contribuem para a continuidade de um texto.",
+        "D3 - Inferir o sentido de uma palavra ou expressão.",
+        "D4 - Inferir uma informação implícita em um texto.",
+        "D5 - Interpretar texto com auxílio de material gráfico diverso (propagandas, quadrinhos, foto etc.).",
+        "D6 - Identificar o tema de um texto.",
+        "D7 - Identificar a tese de um texto.",
+        "D8 - Estabelecer relação entre a tese e os argumentos oferecidos para sustentá-la.",
+        "D9 - Diferenciar as partes principais das secundárias em um texto.",
+        "D10 - Identificar o conflito gerador do enredo e os elementos que constroem a narrativa.",
+        "D11 - Estabelecer relação causa/consequência entre partes e elementos do texto.",
+        "D12 - Identificar a finalidade de textos de diferentes gêneros.",
+        "D13 - Identificar as marcas linguísticas que evidenciam o locutor e o interlocutor de um texto.",
+        "D14 - Distinguir um fato da opinião relativa a esse fato",
+        "D15 - Estabelecer relações lógico-discursivas presentes no texto, marcadas por conjunções, advérbios etc.",
+        "D16 - Identificar efeitos de ironia ou humor em textos variados.",
+        "D17 - Reconhecer o efeito de sentido decorrente do uso da pontuação e de outras notações.",
+        "D18 - Reconhecer o efeito de sentido decorrente da escolha de uma determinada palavra ou expressão.",
+        "D19 - Reconhecer o efeito de sentido decorrente da exploração de recursos ortográficos e/ou morfossintáticos.",
+        "D20 - Reconhecer diferentes formas de tratar uma informação na comparação de textos que tratam do mesmo tema, em função das condições em que ele foi produzido e daquelas em que será recebido.",
+        "D21 - Reconhecer posições distintas entre duas ou mais opiniões relativas ao mesmo fato ou ao mesmo tema."
     ];
 
     const opcoesGeneros = [
@@ -201,6 +227,7 @@ export default function EditarPlanoProfessor() {
                     ano: dadosModelo.ano || "",
                     periodo: dadosModelo.periodo || "",
                     campo_atuacao: "",
+                    descritores: [],
                     generos: [],
                     habilidades: [],
                     objetos: [],
@@ -219,6 +246,7 @@ export default function EditarPlanoProfessor() {
                         ano: dadosProfessor.ano || dadosModelo.ano || "",
                         periodo: dadosProfessor.periodo || dadosModelo.periodo || "",
                         campo_atuacao: dadosProfessor.campo_atuacao || "",
+                        descritores: dadosProfessor.descritores || [],
                         generos: dadosProfessor.generos || [],
                         habilidades: dadosProfessor.habilidades || [],
                         objetos: dadosProfessor.objetos || [],
@@ -328,6 +356,37 @@ export default function EditarPlanoProfessor() {
         }));
     }
 
+    function adicionarDescritor() {
+        if (!novoDescritor) {
+            setErro("Selecione um descritor.");
+            return;
+        }
+
+        setPlanoProfessor((prev) => {
+            const descritoresAtuais = Array.isArray(prev.descritores) ? prev.descritores : [];
+
+            if (descritoresAtuais.includes(novoDescritor)) {
+                setErro("Esse descritor já foi adicionado.");
+                return prev;
+            }
+
+            return {
+                ...prev,
+                descritores: [...descritoresAtuais, novoDescritor]
+            };
+        });
+
+        setErro("");
+        setNovoDescritor("");
+    }
+
+    function removerDescritor(descritor) {
+        setPlanoProfessor((prev) => ({
+            ...prev,
+            descritores: (prev.descritores || []).filter((item) => item !== descritor)
+        }));
+    }
+
     function adicionarGenero() {
         if (!novoGenero) {
             setErro("Selecione um gênero.");
@@ -412,6 +471,7 @@ export default function EditarPlanoProfessor() {
             ano: planoProfessor.ano,
             periodo: planoProfessor.periodo,
             campo_atuacao: planoProfessor.campo_atuacao,
+            descritores: planoProfessor.descritores || [],
             generos: planoProfessor.generos,
             habilidades: planoProfessor.habilidades,
             objetos: planoProfessor.objetos,
@@ -521,8 +581,9 @@ export default function EditarPlanoProfessor() {
                 onClose={() => setErro("")}
             />
 
-            <div className="box">
-                <h1>Editar Plano do Professor</h1>
+            <main className="editar-plano-page">
+            <div className="box editar-plano-card">
+                <h1>E-plano</h1>
 
                 <div className="resumo-edicao">
                     <p><strong>Componente:</strong> {nomesComponentes[planoProfessor.componente] || planoProfessor.componente}</p>
@@ -530,16 +591,7 @@ export default function EditarPlanoProfessor() {
                     <p><strong>Período:</strong> {planoProfessor.periodo || "Não definido"}</p>
                 </div>
 
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: "20px",
-                        gap: "10px",
-                        flexWrap: "wrap"
-                    }}
-                >
+                <div className="editar-plano-intro">
                     <div>
                         <p>
                             Selecione os itens do modelo enviados pelo coordenador conforme a
@@ -556,6 +608,57 @@ export default function EditarPlanoProfessor() {
                 <form onSubmit={handleSubmit}>
                     {etapa === 1 && (
                         <>
+                            <h2>Descritores</h2>
+
+                            <div className="turma-builder">
+                                <div className="turma-builder-grid escola-builder-grid">
+                                    <div className="form-group">
+                                        <label>Descritor</label>
+                                        <select
+                                            value={novoDescritor}
+                                            onChange={(e) => setNovoDescritor(e.target.value)}
+                                        >
+                                            <option value="">Selecione o descritor</option>
+                                            {opcoesDescritores.map((descritor) => (
+                                                <option key={descritor} value={descritor}>
+                                                    {descritor}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="turma-btn-area">
+                                        <button
+                                            type="button"
+                                            className="btn-add-turma"
+                                            onClick={adicionarDescritor}
+                                        >
+                                            <Plus size={18} />
+                                            Adicionar
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="turmas-selecionadas">
+                                    {(planoProfessor.descritores || []).length > 0 ? (
+                                        planoProfessor.descritores.map((descritor) => (
+                                            <div key={descritor} className="turma-tag">
+                                                <span>{descritor}</span>
+                                                <button
+                                                    type="button"
+                                                    className="btn-remover-turma"
+                                                    onClick={() => removerDescritor(descritor)}
+                                                >
+                                                    <MinusCircle size={16} />
+                                                </button>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="turma-vazia">Nenhum descritor adicionado.</div>
+                                    )}
+                                </div>
+                            </div>
+
                             <h2>Campo de Atuação</h2>
                             <select
                                 name="campo_atuacao"
@@ -949,6 +1052,7 @@ export default function EditarPlanoProfessor() {
                     />
                 </div>
             </div>
+            </main>
         </>
     );
 }

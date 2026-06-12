@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { listarModelosProfessor } from "../services/api";
+import { atualizarFotoProfessor, listarModelosProfessor } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import {
   LogOut,
@@ -15,14 +15,16 @@ import {
   X,
   BookText,
   BookCheck,
-  Layers3
+  Layers3,
+  Camera,
+  ImageUp
 } from "lucide-react";
 import "./painelProfessor.css";
 import logoGrande from "./logo-professor.png";
 import logoMini from "./logo-professor.png";
 
 export default function AbaProfessor() {
-  const { usuario, logout } = useAuth();
+  const { usuario, setUsuario, logout } = useAuth();
   const navigate = useNavigate();
 
   const [modelos, setModelos] = useState([]);
@@ -32,6 +34,8 @@ export default function AbaProfessor() {
   const [mobileMenuAberto, setMobileMenuAberto] = useState(false);
   const [filtroStatus, setFiltroStatus] = useState("todos");
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 900);
+  const [enviandoFoto, setEnviandoFoto] = useState(false);
+  const [erroFoto, setErroFoto] = useState("");
 
   useEffect(() => {
     function handleResize() {
@@ -149,6 +153,76 @@ export default function AbaProfessor() {
   function sair() {
     logout();
     navigate("/login");
+  }
+
+  const fotoPerfil = usuario?.foto_perfil_url;
+
+  function renderAvatar(tamanho = "normal") {
+    return (
+      <div className={`avatar-professor ${fotoPerfil ? "com-foto" : ""} ${tamanho}`}>
+        {fotoPerfil ? (
+          <img src={fotoPerfil} alt={`Foto de ${usuario?.nome || "professor"}`} />
+        ) : (
+          usuario?.nome ? usuario.nome.charAt(0).toUpperCase() : "P"
+        )}
+      </div>
+    );
+  }
+
+  function arquivoParaBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handleFotoChange(e) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+
+    if (!file || !usuario?.id) return;
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setErroFoto("Use uma imagem JPG, PNG ou WEBP.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setErroFoto("A imagem deve ter no máximo 5 MB.");
+      return;
+    }
+
+    setErroFoto("");
+    setEnviandoFoto(true);
+
+    try {
+      const imagemBase64 = await arquivoParaBase64(file);
+      const resposta = await atualizarFotoProfessor(usuario.id, {
+        imagemBase64,
+        contentType: file.type
+      });
+
+      if (resposta.error || resposta.erro) {
+        setErroFoto(resposta.error || resposta.erro);
+        return;
+      }
+
+      const usuarioAtualizado = {
+        ...usuario,
+        ...resposta,
+        perfil: "professor",
+        tipo: "professor"
+      };
+
+      setUsuario(usuarioAtualizado);
+      localStorage.setItem("usuario", JSON.stringify(usuarioAtualizado));
+    } catch (error) {
+      setErroFoto("Erro ao enviar a foto. Tente novamente.");
+    } finally {
+      setEnviandoFoto(false);
+    }
   }
 
   function renderStatus(status) {
@@ -288,7 +362,7 @@ export default function AbaProfessor() {
                       className="acao-btn editar"
                     >
                       <Pencil size={18} />
-                      <span>Editar</span>
+                      <span>Criar</span>
                     </button>
                   </div>
                 </div>
@@ -306,6 +380,41 @@ export default function AbaProfessor() {
         <div className="secao-header">
           <h2>Perfil do Professor</h2>
           <p>Informações da sua conta no sistema.</p>
+        </div>
+
+        <div className="perfil-foto-card">
+          {renderAvatar("grande")}
+
+          <div className="perfil-foto-info">
+            <strong>Foto do perfil</strong>
+            <span>Envie uma imagem ou tire uma foto pelo celular.</span>
+            {erroFoto && <p className="foto-erro">{erroFoto}</p>}
+          </div>
+
+          <div className="perfil-foto-acoes">
+            <label className="foto-btn">
+              <ImageUp size={18} />
+              <span>{enviandoFoto ? "Enviando..." : "Enviar foto"}</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleFotoChange}
+                disabled={enviandoFoto}
+              />
+            </label>
+
+            <label className="foto-btn secundario">
+              <Camera size={18} />
+              <span>Tirar foto</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                capture="user"
+                onChange={handleFotoChange}
+                disabled={enviandoFoto}
+              />
+            </label>
+          </div>
         </div>
 
         <div className="perfil-grid">
@@ -466,9 +575,7 @@ export default function AbaProfessor() {
         </nav>
 
         <div className="sidebar-usuario">
-          <div className="avatar-professor">
-            {usuario?.nome ? usuario.nome.charAt(0).toUpperCase() : "P"}
-          </div>
+          {renderAvatar()}
 
           {mostrarTexto && (
             <div className="usuario-info">
