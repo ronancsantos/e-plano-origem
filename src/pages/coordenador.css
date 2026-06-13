@@ -318,14 +318,25 @@
 .acoes {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
   margin-top: 20px;
+  flex-wrap: wrap;
 }
 
 .acoes .btn {
-  width: 46px;
-  height: 46px;
-  padding: 0;
+  min-width: 132px;
+  height: 44px;
+  padding: 10px 16px;
+}
+
+.acoes .btn-etapa {
+  border-radius: 14px;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+.acoes .btn-etapa svg {
+  flex: 0 0 auto;
 }
 
 .progress-container {
@@ -447,5 +458,6 @@ textarea.chat-input-area {
 
   .acoes .btn {
     width: 100%;
+    min-width: 0;
   }
 }

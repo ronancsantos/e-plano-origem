@@ -62,6 +62,9 @@ export default function EditarPlanoProfessor() {
 
     const nomesComponentes = {
         lingua_portuguesa: "Língua Portuguesa",
+        lp_leitura: "LP - Leitura e Oralidade",
+        lp_produção_oralidade: "LP - Produção de Texto-Oralidade",
+        lp_analise_linguistica_e_Semiotica: "LP - Análise Linguística e Semiótica",
         arte: "Arte",
         educacao_fisica: "Educação Física",
         lingua_inglesa: "Língua Inglesa",
@@ -583,476 +586,476 @@ export default function EditarPlanoProfessor() {
             />
 
             <main className="editar-plano-page">
-            <div className="box editar-plano-card">
-                <h1>E-plano</h1>
+                <div className="box editar-plano-card">
+                    <h1>E-plano</h1>
 
-                <div className="resumo-edicao">
-                    <p><strong>Componente:</strong> {nomesComponentes[planoProfessor.componente] || planoProfessor.componente}</p>
-                    <p><strong>Ano:</strong> {planoProfessor.ano}</p>
-                    <p><strong>Período:</strong> {planoProfessor.periodo || "Não definido"}</p>
-                </div>
-
-                <div className="editar-plano-intro">
-                    <div>
-                        <p>
-                            Selecione os itens do modelo enviados pelo coordenador conforme a
-                            realidade da sua turma.
-                        </p>
+                    <div className="resumo-edicao">
+                        <p><strong>Componente:</strong> {nomesComponentes[planoProfessor.componente] || planoProfessor.componente}</p>
+                        <p><strong>Ano:</strong> {planoProfessor.ano}</p>
+                        <p><strong>Período:</strong> {planoProfessor.periodo || "Não definido"}</p>
                     </div>
 
-                    <button className="btn-voltar" onClick={() => navigate("/professor")}>
-                        <ArrowLeft size={18} />
-                        Voltar
-                    </button>
-                </div>
+                    <div className="editar-plano-intro">
+                        <div>
+                            <p>
+                                Selecione os itens do modelo enviados pelo coordenador conforme a
+                                realidade da sua turma.
+                            </p>
+                        </div>
 
-                <form onSubmit={handleSubmit}>
-                    {etapa === 1 && (
-                        <>
-                            <h2>Descritores</h2>
+                        <button className="btn-voltar" onClick={() => navigate("/professor")}>
+                            <ArrowLeft size={18} />
+                            Voltar
+                        </button>
+                    </div>
 
-                            <div className="turma-builder">
-                                <div className="turma-builder-grid escola-builder-grid">
-                                    <div className="form-group">
-                                        <label>Descritor</label>
-                                        <select
-                                            value={novoDescritor}
-                                            onChange={(e) => setNovoDescritor(e.target.value)}
-                                        >
-                                            <option value="">Selecione o descritor</option>
-                                            {opcoesDescritores.map((descritor) => (
-                                                <option key={descritor} value={descritor}>
-                                                    {descritor}
-                                                </option>
-                                            ))}
-                                        </select>
+                    <form onSubmit={handleSubmit}>
+                        {etapa === 1 && (
+                            <>
+                                <h2>Descritores</h2>
+
+                                <div className="turma-builder">
+                                    <div className="turma-builder-grid escola-builder-grid">
+                                        <div className="form-group">
+                                            <label>Descritor</label>
+                                            <select
+                                                value={novoDescritor}
+                                                onChange={(e) => setNovoDescritor(e.target.value)}
+                                            >
+                                                <option value="">Selecione o descritor</option>
+                                                {opcoesDescritores.map((descritor) => (
+                                                    <option key={descritor} value={descritor}>
+                                                        {descritor}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="turma-btn-area">
+                                            <button
+                                                type="button"
+                                                className="btn-add-turma"
+                                                onClick={adicionarDescritor}
+                                            >
+                                                <Plus size={18} />
+                                                Adicionar
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    <div className="turma-btn-area">
-                                        <button
-                                            type="button"
-                                            className="btn-add-turma"
-                                            onClick={adicionarDescritor}
-                                        >
-                                            <Plus size={18} />
-                                            Adicionar
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="turmas-selecionadas">
-                                    {(planoProfessor.descritores || []).length > 0 ? (
-                                        planoProfessor.descritores.map((descritor) => (
-                                            <div key={descritor} className="turma-tag">
-                                                <span>{descritor}</span>
-                                                <button
-                                                    type="button"
-                                                    className="btn-remover-turma"
-                                                    onClick={() => removerDescritor(descritor)}
-                                                >
-                                                    <MinusCircle size={16} />
-                                                </button>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="turma-vazia">Nenhum descritor adicionado.</div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <h2>Campo de Atuação</h2>
-                            <select
-                                name="campo_atuacao"
-                                value={planoProfessor.campo_atuacao}
-                                onChange={handleChange}
-                            >
-                                <option value="">Selecione o campo de atuação</option>
-                                {camposAtuacao.map((campo) => (
-                                    <option key={campo} value={campo}>
-                                        {campo}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <h2>Gêneros</h2>
-
-                            <div className="turma-builder">
-                                <div className="turma-builder-grid escola-builder-grid">
-                                    <div className="form-group">
-                                        <label>Gênero</label>
-                                        <select
-                                            value={novoGenero}
-                                            onChange={(e) => setNovoGenero(e.target.value)}
-                                        >
-                                            <option value="">Selecione o gênero</option>
-                                            {opcoesGeneros.map((genero) => (
-                                                <option key={genero} value={genero}>
-                                                    {genero}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div className="turma-btn-area">
-                                        <button
-                                            type="button"
-                                            className="btn-add-turma"
-                                            onClick={adicionarGenero}
-                                        >
-                                            <Plus size={18} />
-                                            Adicionar
-                                        </button>
+                                    <div className="turmas-selecionadas">
+                                        {(planoProfessor.descritores || []).length > 0 ? (
+                                            planoProfessor.descritores.map((descritor) => (
+                                                <div key={descritor} className="turma-tag">
+                                                    <span>{descritor}</span>
+                                                    <button
+                                                        type="button"
+                                                        className="btn-remover-turma"
+                                                        onClick={() => removerDescritor(descritor)}
+                                                    >
+                                                        <MinusCircle size={16} />
+                                                    </button>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="turma-vazia">Nenhum descritor adicionado.</div>
+                                        )}
                                     </div>
                                 </div>
 
-                                <div className="turmas-selecionadas">
-                                    {planoProfessor.generos.length > 0 ? (
-                                        planoProfessor.generos.map((genero) => (
-                                            <div key={genero} className="turma-tag">
-                                                <span>{genero}</span>
-                                                <button
-                                                    type="button"
-                                                    className="btn-remover-turma"
-                                                    onClick={() => removerGenero(genero)}
-                                                >
-                                                    <MinusCircle size={16} />
-                                                </button>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="turma-vazia">Nenhum gênero adicionado.</div>
-                                    )}
+                                <h2>Campo de Atuação</h2>
+                                <select
+                                    name="campo_atuacao"
+                                    value={planoProfessor.campo_atuacao}
+                                    onChange={handleChange}
+                                >
+                                    <option value="">Selecione o campo de atuação</option>
+                                    {camposAtuacao.map((campo) => (
+                                        <option key={campo} value={campo}>
+                                            {campo}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <h2>Gêneros</h2>
+
+                                <div className="turma-builder">
+                                    <div className="turma-builder-grid escola-builder-grid">
+                                        <div className="form-group">
+                                            <label>Gênero</label>
+                                            <select
+                                                value={novoGenero}
+                                                onChange={(e) => setNovoGenero(e.target.value)}
+                                            >
+                                                <option value="">Selecione o gênero</option>
+                                                {opcoesGeneros.map((genero) => (
+                                                    <option key={genero} value={genero}>
+                                                        {genero}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="turma-btn-area">
+                                            <button
+                                                type="button"
+                                                className="btn-add-turma"
+                                                onClick={adicionarGenero}
+                                            >
+                                                <Plus size={18} />
+                                                Adicionar
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="turmas-selecionadas">
+                                        {planoProfessor.generos.length > 0 ? (
+                                            planoProfessor.generos.map((genero) => (
+                                                <div key={genero} className="turma-tag">
+                                                    <span>{genero}</span>
+                                                    <button
+                                                        type="button"
+                                                        className="btn-remover-turma"
+                                                        onClick={() => removerGenero(genero)}
+                                                    >
+                                                        <MinusCircle size={16} />
+                                                    </button>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="turma-vazia">Nenhum gênero adicionado.</div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <h2>Habilidades sugeridas pelo coordenador</h2>
-                            <input
-                                placeholder="Buscar habilidade..."
-                                value={busca}
-                                onChange={(e) => setBusca(e.target.value)}
-                            />
-
-                            <div className="lista">
-                                {habilidadesComDescricao().map((item, index) => (
-                                    <label key={index}>
-                                        <input
-                                            type="checkbox"
-                                            checked={planoProfessor.habilidades.includes(item.codigo)}
-                                            onChange={() => toggleItem("habilidades", item.codigo)}
-                                        />
-                                        <span>
-                                            <span className="habilidade-codigo">({item.codigo})</span>
-                                            <span className="habilidade-texto">{item.descricao}</span>
-                                        </span>
-                                    </label>
-                                ))}
-                            </div>
-
-                            <button
-                                type="button"
-                                className="btn btn-success"
-                                onClick={() => selecionarTodos("habilidades", modeloBase.habilidades || [])}
-                            >
-                                <CopyCheck color="#ffff" size={15} />
-                                Selecionar todos
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-danger"
-                                onClick={() => limparTodos("habilidades")}
-                            >
-                                <CopyX color="#ffff" size={15} />
-                                Desmarcar todos
-                            </button>
-
-                            <div className="acoes">
-                                <button
-                                    type="button"
-                                    className="btn btn-primary"
-                                    onClick={validarEtapa1}
-                                >
-                                    <CircleArrowRight color="#ffffff" size={30} />
-                                </button>
-                            </div>
-                        </>
-                    )}
-
-                    {etapa === 2 && (
-                        <>
-                            <h2>Objetos de Conhecimento</h2>
-
-                            <div className="lista">
-                                {objetosFiltrados().map((obj) => (
-                                    <label key={obj}>
-                                        <input
-                                            type="checkbox"
-                                            checked={planoProfessor.objetos.includes(obj)}
-                                            onChange={() => toggleItem("objetos", obj)}
-                                        />
-                                        {obj}
-                                    </label>
-                                ))}
-                            </div>
-                            <button
-                                type="button"
-                                className="btn btn-success"
-                                onClick={() => selecionarTodos("objetos", objetosFiltrados())}
-                            >
-                                <CopyCheck color="#ffff" size={15} />
-                                Selecionar todos
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-danger"
-                                onClick={() => limparTodos("objetos")}
-                            >
-                                <CopyX color="#ffff" size={15} />
-                                Desmarcar todos
-                            </button>
-
-                            <div className="acoes">
-                                <button
-                                    type="button"
-                                    className="btn btn-info"
-                                    onClick={() => setEtapa(1)}
-                                >
-                                    <CircleArrowLeft color="#ffffff" size={30} />
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-primary"
-                                    onClick={() => setEtapa(3)}
-                                >
-                                    <CircleArrowRight color="#ffffff" size={30} />
-                                </button>
-                            </div>
-                        </>
-                    )}
-
-                    {etapa === 3 && (
-                        <>
-                            <h2>Instrumentos Avaliativos</h2>
-                            {opcoesInstrumentos.map((item) => (
-                                <label key={item}>
-                                    <input
-                                        type="checkbox"
-                                        checked={planoProfessor.instrumentos.includes(item)}
-                                        onChange={() => toggleItem("instrumentos", item)}
-                                    />
-                                    {item}
-                                </label>
-                            ))}
-                            <button
-                                type="button"
-                                className="btn btn-success"
-                                onClick={() => selecionarTodos("instrumentos", opcoesInstrumentos)}
-                            >
-                                <CopyCheck color="#ffff" size={15} />
-                                Selecionar todos
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-danger"
-                                onClick={() => limparTodos("instrumentos")}
-                            >
-                                <CopyX color="#ffff" size={15} />
-                                Desmarcar todos
-                            </button>
-
-                            <h3>Recursos usados na mensuração da aprendizagem</h3>
-                            {opcoesRecursosAvaliacao.map((item) => (
-                                <label key={item}>
-                                    <input
-                                        type="checkbox"
-                                        checked={planoProfessor.recursosAvaliacao.includes(item)}
-                                        onChange={() => toggleItem("recursosAvaliacao", item)}
-                                    />
-                                    {item}
-                                </label>
-                            ))}
-                            <button
-                                type="button"
-                                className="btn btn-success"
-                                onClick={() => selecionarTodos("recursosAvaliacao", opcoesRecursosAvaliacao)}
-                            >
-                                <CopyCheck color="#ffff" size={15} />
-                                Selecionar todos
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-danger"
-                                onClick={() => limparTodos("recursosAvaliacao")}
-                            >
-                                <CopyX color="#ffff" size={15} />
-                                Desmarcar todos
-                            </button>
-
-                            <div className="acoes">
-                                <button
-                                    type="button"
-                                    className="btn btn-info"
-                                    onClick={() => setEtapa(2)}
-                                >
-                                    <CircleArrowLeft color="#ffffff" size={30} />
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-primary"
-                                    onClick={() => setEtapa(4)}
-                                >
-                                    <CircleArrowRight color="#ffffff" size={30} />
-                                </button>
-                            </div>
-                        </>
-                    )}
-
-                    {etapa === 4 && (
-                        <>
-                            <h2>Critérios Avaliativos</h2>
-
-                            {Array.isArray(modeloBase.tipos_avaliacao) && modeloBase.tipos_avaliacao.length > 0 && (
-                                <div className="resumo-edicao" style={{ marginBottom: "16px" }}>
-                                    <p>
-                                        <strong>Sugestões do coordenador:</strong>{" "}
-                                        {modeloBase.tipos_avaliacao.join("; ")}
-                                    </p>
-                                </div>
-                            )}
-
-                            <div className="chat-input-wrap">
-                                <textarea
-                                    ref={tiposAvaliacaoRef}
-                                    name="tiposAvaliacaoTexto"
-                                    value={planoProfessor.tiposAvaliacaoTexto || ""}
-                                    onChange={(e) => {
-                                        handleChange(e);
-                                        e.target.style.height = "0px";
-                                        e.target.style.height = `${e.target.scrollHeight}px`;
-                                    }}
-                                    className="chat-input-area"
-                                    placeholder="Descreva os tipos de avaliação que serão utilizados..."
-                                    rows={1}
+                                <h2>Habilidades sugeridas pelo coordenador</h2>
+                                <input
+                                    placeholder="Buscar habilidade..."
+                                    value={busca}
+                                    onChange={(e) => setBusca(e.target.value)}
                                 />
-                            </div>
 
-                            <div className="acoes">
+                                <div className="lista">
+                                    {habilidadesComDescricao().map((item, index) => (
+                                        <label key={index}>
+                                            <input
+                                                type="checkbox"
+                                                checked={planoProfessor.habilidades.includes(item.codigo)}
+                                                onChange={() => toggleItem("habilidades", item.codigo)}
+                                            />
+                                            <span>
+                                                <span className="habilidade-codigo">({item.codigo})</span>
+                                                <span className="habilidade-texto">{item.descricao}</span>
+                                            </span>
+                                        </label>
+                                    ))}
+                                </div>
+
                                 <button
                                     type="button"
-                                    className="btn btn-info"
-                                    onClick={() => setEtapa(3)}
+                                    className="btn btn-success"
+                                    onClick={() => selecionarTodos("habilidades", modeloBase.habilidades || [])}
                                 >
-                                    <CircleArrowLeft color="#ffffff" size={30} />
+                                    <CopyCheck color="#ffff" size={15} />
+                                    Selecionar todos
                                 </button>
-
                                 <button
                                     type="button"
-                                    className="btn btn-primary"
-                                    onClick={() => setEtapa(5)}
+                                    className="btn btn-danger"
+                                    onClick={() => limparTodos("habilidades")}
                                 >
-                                    <CircleArrowRight color="#ffffff" size={30} />
+                                    <CopyX color="#ffff" size={15} />
+                                    Desmarcar todos
                                 </button>
-                            </div>
-                        </>
-                    )}
 
-                    {etapa === 5 && (
-                        <>
-                            <h2>Metodologias</h2>
-                            {opcoesMetodologias.map((item) => (
-                                <label key={item}>
-                                    <input
-                                        type="checkbox"
-                                        checked={planoProfessor.metodologias.includes(item)}
-                                        onChange={() => toggleItem("metodologias", item)}
-                                    />
-                                    {item}
-                                </label>
-                            ))}
-                            <button
-                                type="button"
-                                className="btn btn-success"
-                                onClick={() => selecionarTodos("metodologias", opcoesMetodologias)}
-                            >
-                                <CopyCheck color="#ffff" size={15} />
-                                Selecionar todos
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-danger"
-                                onClick={() => limparTodos("metodologias")}
-                            >
-                                <CopyX color="#ffff" size={15} />
-                                Desmarcar todos
-                            </button>
+                                <div className="acoes">
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary"
+                                        onClick={validarEtapa1}
+                                    >
+                                        <CircleArrowRight color="#ffffff" size={30} />
+                                    </button>
+                                </div>
+                            </>
+                        )}
 
-                            <h3>Recursos usados na abordagem do conhecimento</h3>
-                            {opcoesRecursosMetodologia.map((item) => (
-                                <label key={item}>
-                                    <input
-                                        type="checkbox"
-                                        checked={planoProfessor.recursosMetodologia.includes(item)}
-                                        onChange={() => toggleItem("recursosMetodologia", item)}
-                                    />
-                                    {item}
-                                </label>
-                            ))}
-                            <button
-                                type="button"
-                                className="btn btn-success"
-                                onClick={() => selecionarTodos("recursosMetodologia", opcoesRecursosMetodologia)}
-                            >
-                                <CopyCheck color="#ffff" size={15} />
-                                Selecionar todos
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-danger"
-                                onClick={() => limparTodos("recursosMetodologia")}
-                            >
-                                <CopyX color="#ffff" size={15} />
-                                Desmarcar todos
-                            </button>
+                        {etapa === 2 && (
+                            <>
+                                <h2>Objetos de Conhecimento</h2>
 
-                            <div className="form-group" style={{ marginTop: "30px" }}>
-                                <h2>Observações do Professor</h2>
+                                <div className="lista">
+                                    {objetosFiltrados().map((obj) => (
+                                        <label key={obj}>
+                                            <input
+                                                type="checkbox"
+                                                checked={planoProfessor.objetos.includes(obj)}
+                                                onChange={() => toggleItem("objetos", obj)}
+                                            />
+                                            {obj}
+                                        </label>
+                                    ))}
+                                </div>
+                                <button
+                                    type="button"
+                                    className="btn btn-success"
+                                    onClick={() => selecionarTodos("objetos", objetosFiltrados())}
+                                >
+                                    <CopyCheck color="#ffff" size={15} />
+                                    Selecionar todos
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    onClick={() => limparTodos("objetos")}
+                                >
+                                    <CopyX color="#ffff" size={15} />
+                                    Desmarcar todos
+                                </button>
+
+                                <div className="acoes">
+                                    <button
+                                        type="button"
+                                        className="btn btn-info"
+                                        onClick={() => setEtapa(1)}
+                                    >
+                                        <CircleArrowLeft color="#ffffff" size={30} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary"
+                                        onClick={() => setEtapa(3)}
+                                    >
+                                        <CircleArrowRight color="#ffffff" size={30} />
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                        {etapa === 3 && (
+                            <>
+                                <h2>Instrumentos Avaliativos</h2>
+                                {opcoesInstrumentos.map((item) => (
+                                    <label key={item}>
+                                        <input
+                                            type="checkbox"
+                                            checked={planoProfessor.instrumentos.includes(item)}
+                                            onChange={() => toggleItem("instrumentos", item)}
+                                        />
+                                        {item}
+                                    </label>
+                                ))}
+                                <button
+                                    type="button"
+                                    className="btn btn-success"
+                                    onClick={() => selecionarTodos("instrumentos", opcoesInstrumentos)}
+                                >
+                                    <CopyCheck color="#ffff" size={15} />
+                                    Selecionar todos
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    onClick={() => limparTodos("instrumentos")}
+                                >
+                                    <CopyX color="#ffff" size={15} />
+                                    Desmarcar todos
+                                </button>
+
+                                <h3>Recursos usados na mensuração da aprendizagem</h3>
+                                {opcoesRecursosAvaliacao.map((item) => (
+                                    <label key={item}>
+                                        <input
+                                            type="checkbox"
+                                            checked={planoProfessor.recursosAvaliacao.includes(item)}
+                                            onChange={() => toggleItem("recursosAvaliacao", item)}
+                                        />
+                                        {item}
+                                    </label>
+                                ))}
+                                <button
+                                    type="button"
+                                    className="btn btn-success"
+                                    onClick={() => selecionarTodos("recursosAvaliacao", opcoesRecursosAvaliacao)}
+                                >
+                                    <CopyCheck color="#ffff" size={15} />
+                                    Selecionar todos
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    onClick={() => limparTodos("recursosAvaliacao")}
+                                >
+                                    <CopyX color="#ffff" size={15} />
+                                    Desmarcar todos
+                                </button>
+
+                                <div className="acoes">
+                                    <button
+                                        type="button"
+                                        className="btn btn-info"
+                                        onClick={() => setEtapa(2)}
+                                    >
+                                        <CircleArrowLeft color="#ffffff" size={30} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary"
+                                        onClick={() => setEtapa(4)}
+                                    >
+                                        <CircleArrowRight color="#ffffff" size={30} />
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                        {etapa === 4 && (
+                            <>
+                                <h2>Critérios Avaliativos</h2>
+
+                                {Array.isArray(modeloBase.tipos_avaliacao) && modeloBase.tipos_avaliacao.length > 0 && (
+                                    <div className="resumo-edicao" style={{ marginBottom: "16px" }}>
+                                        <p>
+                                            <strong>Sugestões do coordenador:</strong>{" "}
+                                            {modeloBase.tipos_avaliacao.join("; ")}
+                                        </p>
+                                    </div>
+                                )}
+
                                 <div className="chat-input-wrap">
                                     <textarea
-                                        ref={observacoesRef}
-                                        name="observacoes"
-                                        value={planoProfessor.observacoes}
+                                        ref={tiposAvaliacaoRef}
+                                        name="tiposAvaliacaoTexto"
+                                        value={planoProfessor.tiposAvaliacaoTexto || ""}
                                         onChange={(e) => {
                                             handleChange(e);
                                             e.target.style.height = "0px";
                                             e.target.style.height = `${e.target.scrollHeight}px`;
                                         }}
                                         className="chat-input-area"
-                                        placeholder="Descreva adaptações, realidade da turma, estratégias próprias, etc."
+                                        placeholder="Descreva os tipos de avaliação que serão utilizados..."
                                         rows={1}
                                     />
                                 </div>
-                            </div>
 
-                            <div className="acoes">
+                                <div className="acoes">
+                                    <button
+                                        type="button"
+                                        className="btn btn-info"
+                                        onClick={() => setEtapa(3)}
+                                    >
+                                        <CircleArrowLeft color="#ffffff" size={30} />
+                                    </button>
 
-                                <button type="submit" className="btn btn-primary btn-right btn-margem">
-                                    <BookCheck color="#ffff" size={20} />
-                                    SALVAR
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary"
+                                        onClick={() => setEtapa(5)}
+                                    >
+                                        <CircleArrowRight color="#ffffff" size={30} />
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                        {etapa === 5 && (
+                            <>
+                                <h2>Metodologias</h2>
+                                {opcoesMetodologias.map((item) => (
+                                    <label key={item}>
+                                        <input
+                                            type="checkbox"
+                                            checked={planoProfessor.metodologias.includes(item)}
+                                            onChange={() => toggleItem("metodologias", item)}
+                                        />
+                                        {item}
+                                    </label>
+                                ))}
+                                <button
+                                    type="button"
+                                    className="btn btn-success"
+                                    onClick={() => selecionarTodos("metodologias", opcoesMetodologias)}
+                                >
+                                    <CopyCheck color="#ffff" size={15} />
+                                    Selecionar todos
                                 </button>
-                            </div>
-                        </>
-                    )}
-                </form>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    onClick={() => limparTodos("metodologias")}
+                                >
+                                    <CopyX color="#ffff" size={15} />
+                                    Desmarcar todos
+                                </button>
 
-                <div className="progress-container">
-                    <div
-                        className="progress-bar"
-                        style={{
-                            width: `${(etapa / 5) * 100}%`,
-                            background: (etapa / 5) === 1 ? "#16a34a" : "linear-gradient(90deg, #3b82f6, #60a5fa)"
-                        }}
-                    />
+                                <h3>Recursos usados na abordagem do conhecimento</h3>
+                                {opcoesRecursosMetodologia.map((item) => (
+                                    <label key={item}>
+                                        <input
+                                            type="checkbox"
+                                            checked={planoProfessor.recursosMetodologia.includes(item)}
+                                            onChange={() => toggleItem("recursosMetodologia", item)}
+                                        />
+                                        {item}
+                                    </label>
+                                ))}
+                                <button
+                                    type="button"
+                                    className="btn btn-success"
+                                    onClick={() => selecionarTodos("recursosMetodologia", opcoesRecursosMetodologia)}
+                                >
+                                    <CopyCheck color="#ffff" size={15} />
+                                    Selecionar todos
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    onClick={() => limparTodos("recursosMetodologia")}
+                                >
+                                    <CopyX color="#ffff" size={15} />
+                                    Desmarcar todos
+                                </button>
+
+                                <div className="form-group" style={{ marginTop: "30px" }}>
+                                    <h2>Observações do Professor</h2>
+                                    <div className="chat-input-wrap">
+                                        <textarea
+                                            ref={observacoesRef}
+                                            name="observacoes"
+                                            value={planoProfessor.observacoes}
+                                            onChange={(e) => {
+                                                handleChange(e);
+                                                e.target.style.height = "0px";
+                                                e.target.style.height = `${e.target.scrollHeight}px`;
+                                            }}
+                                            className="chat-input-area"
+                                            placeholder="Descreva adaptações, realidade da turma, estratégias próprias, etc."
+                                            rows={1}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="acoes">
+
+                                    <button type="submit" className="btn btn-primary btn-right btn-margem">
+                                        <BookCheck color="#ffff" size={20} />
+                                        SALVAR
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </form>
+
+                    <div className="progress-container">
+                        <div
+                            className="progress-bar"
+                            style={{
+                                width: `${(etapa / 5) * 100}%`,
+                                background: (etapa / 5) === 1 ? "#16a34a" : "linear-gradient(90deg, #3b82f6, #60a5fa)"
+                            }}
+                        />
+                    </div>
                 </div>
-            </div>
             </main>
         </>
     );

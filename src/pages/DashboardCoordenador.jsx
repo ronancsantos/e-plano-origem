@@ -15,7 +15,7 @@ import {
     Users,
     RefreshCw,
     LayoutDashboard,
-    BookOpenCheck
+    Layers3
 } from "lucide-react";
 import { listarResumoDashboardCoordenador } from "../services/api";
 import "./dashboard-coordenador.css";
@@ -214,16 +214,16 @@ export default function DashboardCoordenador() {
                     ) : professoresComResumo.length === 0 ? (
                         <div className="estado-box">Nenhum professor encontrado.</div>
                     ) : (
-                        <div className="professores-grid">
+                        <div className="coord-professores-grid">
                             {professoresComResumo.map((professor, index) => (
-                                <div className="professor-card" key={professor.id || index}>
-                                    <div className="professor-card-topo">
+                                <div className="coord-professor-card" key={professor.id || index}>
+                                    <div className="coord-professor-card-topo">
 
 
-                                        <div className="professor-info">
+                                        <div className="coord-professor-info">
                                             <h3>{professor.nome}</h3>
 
-                                            <div className="professor-footer">
+                                            <div className="coord-professor-footer">
                                                 {Number(professor.total || 0) === 0 ? (
                                                     <span className="tag-sem-plano">Sem planos disponíveis</span>
                                                 ) : Number(professor.concluidos || 0) === Number(professor.total || 0) ? (
@@ -473,7 +473,7 @@ export default function DashboardCoordenador() {
                         }}
                         title="Planos"
                     >
-                        <BookOpenCheck size={20} />
+                        <Layers3 size={20} />
                         {mostrarTexto && <span>Planos</span>}
                     </button>
 
@@ -496,7 +496,7 @@ export default function DashboardCoordenador() {
                         }}
                         title="Usuários"
                     >
-                        <ClipboardList size={20} />
+                        <User size={20} />
                         {mostrarTexto && <span>Usuários</span>}
                     </button>
 

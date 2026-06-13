@@ -57,6 +57,9 @@ export default function AbaProfessor() {
 
   const nomesComponentes = {
     lingua_portuguesa: "Língua Portuguesa",
+    lp_leitura: "LP - Leitura e Oralidade",
+    lp_produção_oralidade: "LP - Produção de Texto-Oralidade",
+    lp_analise_linguistica_e_Semiotica: "LP - Análise Linguística e Semiótica",
     arte: "Arte",
     educacao_fisica: "Educação Física",
     lingua_inglesa: "Língua Inglesa",

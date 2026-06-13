@@ -7,7 +7,7 @@ import {
   atualizarPlano
 } from "../services/api";
 import "./coordenador.css";
-import { ChevronRight, CircleArrowRight, CircleArrowLeft, Layer3, CircleAlert, CopyCheck, CopyX } from "lucide-react";
+import { ChevronRight, CircleArrowRight, CircleArrowLeft, Layers3, CircleAlert, CopyCheck, CopyX } from "lucide-react";
 import Toast from "./Toast";
 
 export default function Coordenador() {
@@ -47,6 +47,9 @@ export default function Coordenador() {
 
   const componentes = [
     { value: "lingua_portuguesa", label: "Língua Portuguesa" },
+    { value: "lp_leitura", label: "LP - Leitura e Oralidade"},
+    { value: "lp_produção_oralidade", label: "LP - Produção de Texto-Oralidade"},
+    { value: "lp_analise_linguistica_e_Semiotica", label: "LP - Análise Linguística e Semiótica"},
     { value: "arte", label: "Arte" },
     { value: "educacao_fisica", label: "Educação Física" },
     { value: "lingua_inglesa", label: "Língua Inglesa" },
@@ -156,6 +159,15 @@ export default function Coordenador() {
   };
 
   const handleSalvar = async () => {
+    if (!etapaCompleta(5)) {
+      setPopup({
+        show: true,
+        mensagem: mensagemEtapa(5),
+        tipo: "erro"
+      });
+      return;
+    }
+
     if (!modelo.periodo) {
       mostrarPopup("Selecione o período", "erro");
       return;
@@ -239,13 +251,34 @@ export default function Coordenador() {
   };
 
   const etapaLiberada = (numero) => {
-    if (id || numero <= etapa) return true;
+    if (id || numero === 1) return true;
 
     for (let atual = 1; atual < numero; atual += 1) {
       if (!etapaCompleta(atual)) return false;
     }
 
     return true;
+  };
+
+  const navegarEtapa = (numero) => {
+    if (id || numero <= etapa) {
+      setEtapa(numero);
+      return;
+    }
+
+    for (let atual = 1; atual < numero; atual += 1) {
+      if (!etapaCompleta(atual)) {
+        setPopup({
+          show: true,
+          mensagem: mensagemEtapa(atual),
+          tipo: "erro"
+        });
+        setEtapa(atual);
+        return;
+      }
+    }
+
+    setEtapa(numero);
   };
 
   const avancarEtapa = (proximaEtapa) => {
@@ -277,7 +310,7 @@ export default function Coordenador() {
             key={item.numero}
             type="button"
             className={`etapa-pill ${etapa === item.numero ? "ativa" : ""} ${etapa > item.numero ? "concluida" : ""}`}
-            onClick={() => etapaLiberada(item.numero) && setEtapa(item.numero)}
+            onClick={() => navegarEtapa(item.numero)}
             disabled={!etapaLiberada(item.numero)}
           >
             <span>{item.numero}</span>
@@ -361,8 +394,8 @@ export default function Coordenador() {
           <button className="btn btn-danger" onClick={() => setModelo({ ...modelo, habilidades: [] })}><CopyX color="#ffff" size={15}/>Desmarcar todos</button>
 
           <div className="acoes">
-            <button className="btn btn-info" onClick={() => setEtapa(1)} ><CircleArrowLeft color="#ffffff" size={30} /></button>
-            <button className="btn btn-primary" onClick={() => avancarEtapa(3)}><CircleArrowRight color="#ffffff" size={30} /></button>
+            <button className="btn btn-info btn-etapa" onClick={() => setEtapa(1)}><CircleArrowLeft color="#ffffff" size={22} />Anterior</button>
+            <button className="btn btn-primary btn-etapa" onClick={() => avancarEtapa(3)}>Próximo<CircleArrowRight color="#ffffff" size={22} /></button>
           </div>
 
         </>
@@ -388,8 +421,8 @@ export default function Coordenador() {
           <button className="btn btn-danger" onClick={() => setModelo({ ...modelo, objetos: [] })}><CopyX color="#ffff" size={15}/>Desmarcar todos</button>
 
           <div className="acoes">
-            <button className="btn btn-info" onClick={() => setEtapa(2)} ><CircleArrowLeft color="#ffffff" size={30} /></button>
-            <button className="btn btn-primary" onClick={() => avancarEtapa(4)}><CircleArrowRight color="#ffffff" size={30} /></button>
+            <button className="btn btn-info btn-etapa" onClick={() => setEtapa(2)}><CircleArrowLeft color="#ffffff" size={22} />Anterior</button>
+            <button className="btn btn-primary btn-etapa" onClick={() => avancarEtapa(4)}>Próximo<CircleArrowRight color="#ffffff" size={22} /></button>
           </div>
         </>
       )}
@@ -418,8 +451,8 @@ export default function Coordenador() {
           <button className="btn btn-danger" onClick={() => setModelo({ ...modelo, recursosAvaliacao: [] })}><CopyX color="#ffff" size={15}/>Desmarcar todos</button>
 
           <div className="acoes">
-            <button className="btn btn-info" onClick={() => setEtapa(3)} ><CircleArrowLeft color="#ffffff" size={30} /></button>
-            <button className="btn btn-primary" onClick={() => avancarEtapa(5)}><CircleArrowRight color="#ffffff" size={30} /></button>
+            <button className="btn btn-info btn-etapa" onClick={() => setEtapa(3)}><CircleArrowLeft color="#ffffff" size={22} />Anterior</button>
+            <button className="btn btn-primary btn-etapa" onClick={() => avancarEtapa(5)}>Próximo<CircleArrowRight color="#ffffff" size={22} /></button>
           </div>
         </>
       )}
@@ -449,7 +482,7 @@ export default function Coordenador() {
           <button className="btn btn-success" onClick={() => setModelo({ ...modelo, recursosMetodologia: recursosMetodologia })}><CopyCheck color="#ffff" size={15}/>Selecionar todos</button>
           <button className="btn btn-danger" onClick={() => setModelo({ ...modelo, recursosMetodologia: [] })}><CopyX color="#ffff" size={15}/>Desmarcar todos</button>
 
-          <button className="btn btn-primary btn-right btn-margem" onClick={handleSalvar}><Layer3 color="#ffff" size={20} />FINALIZAR</button>
+          <button className="btn btn-primary btn-right btn-margem" onClick={handleSalvar}><Layers3 color="#ffff" size={20} />FINALIZAR</button>
           
         </>
       )}

@@ -436,7 +436,7 @@ export default function VisualizarPlanoProfessor() {
                 <div className="plano-doc">
                     <div className="topo-doc bloco-pequeno">
                         <div className="logo-central">
-                            <img src="/logo.png" alt="Logo" />
+                            <img src="/logo-professor.png" alt="Logo" />
                         </div>
                     </div>
 
