@@ -1331,7 +1331,7 @@
       }
     ]
   },
-  "lp_producao_oralidade ":{
+  "lp_producao_oralidade":{
     "nome_disciplina": "LP - Produção de Texto-Oralidade",
     "ano":[
       {
@@ -1582,7 +1582,7 @@
       }     
     ]
   },
-  "lp_analise_linguistica_e_Semiotica ":{
+  "lp_analise_linguistica_e_Semiotica":{
     "nome_disciplina": "LP - Análise Linguística e Semiótica",
     "ano":[
       {

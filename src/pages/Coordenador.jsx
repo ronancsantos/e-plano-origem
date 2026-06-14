@@ -48,7 +48,7 @@ export default function Coordenador() {
   const componentes = [
     { value: "lingua_portuguesa", label: "Língua Portuguesa" },
     { value: "lp_leitura", label: "LP - Leitura e Oralidade"},
-    { value: "lp_produção_oralidade", label: "LP - Produção de Texto-Oralidade"},
+    { value: "lp_producao_oralidade", label: "LP - Produção de Texto-Oralidade"},
     { value: "lp_analise_linguistica_e_Semiotica", label: "LP - Análise Linguística e Semiótica"},
     { value: "arte", label: "Arte" },
     { value: "educacao_fisica", label: "Educação Física" },

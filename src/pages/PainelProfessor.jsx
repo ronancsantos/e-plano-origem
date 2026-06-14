@@ -58,7 +58,7 @@ export default function AbaProfessor() {
   const nomesComponentes = {
     lingua_portuguesa: "Língua Portuguesa",
     lp_leitura: "LP - Leitura e Oralidade",
-    lp_produção_oralidade: "LP - Produção de Texto-Oralidade",
+    lp_producao_oralidade: "LP - Produção de Texto-Oralidade",
     lp_analise_linguistica_e_Semiotica: "LP - Análise Linguística e Semiótica",
     arte: "Arte",
     educacao_fisica: "Educação Física",
@@ -231,10 +231,10 @@ export default function AbaProfessor() {
     return (
       <span
         className={`status-badge ${status === "finalizado"
-            ? "finalizado"
-            : status === "em_andamento"
-              ? "em-andamento"
-              : "pendente"
+          ? "finalizado"
+          : status === "em_andamento"
+            ? "em-andamento"
+            : "pendente"
           }`}
       >
         {status === "finalizado"
@@ -330,8 +330,8 @@ export default function AbaProfessor() {
               {modelosFiltrados.map((p) => (
                 <div
                   className={`modelo-card ${p.professor_status_exibicao === "finalizado"
-                      ? "card-finalizado"
-                      : ""
+                    ? "card-finalizado"
+                    : ""
                     }`}
                   key={p.id}
                 >
@@ -476,12 +476,12 @@ export default function AbaProfessor() {
 
       <aside
         className={`sidebar-professor ${isMobile
-            ? mobileMenuAberto
-              ? "mobile-aberta"
-              : "mobile-fechada"
-            : sidebarExpandida
-              ? "expandida"
-              : "recolhida"
+          ? mobileMenuAberto
+            ? "mobile-aberta"
+            : "mobile-fechada"
+          : sidebarExpandida
+            ? "expandida"
+            : "recolhida"
           }`}
       >
         <div className="sidebar-topo">

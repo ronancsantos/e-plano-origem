@@ -51,9 +51,9 @@ export default function VisualizarPlanoProfessor() {
 
     const nomeComponente = {
         lingua_portuguesa: "Língua Portuguesa",
-        lp_leitura_e_oralidade: "LP - Leitura e Oralidade",
-        lp_producao_de_texto_e_oralidade: "LP - Produção de Texto e Oralidade",
-        lp_analise_linguistica_e_semiotica: "LP - Análise Linguística e Semiótica",
+        lp_leitura: "LP - Leitura e Oralidade",
+    lp_producao_oralidade: "LP - Produção de Texto-Oralidade",
+    lp_analise_linguistica_e_Semiotica: "LP - Análise Linguística e Semiótica",
         arte: "Arte",
         educacao_fisica: "Educação Física",
         lingua_inglesa: "Língua Inglesa",
