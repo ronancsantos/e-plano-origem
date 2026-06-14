@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { ArrowLeft, Download, Printer } from "lucide-react";
 import jsPDF from "jspdf";
 import "./visualizarProf.css";
+import logoPlano from "./logo-plano.png";
 
 export default function VisualizarPlanoProfessor() {
     const { id } = useParams();
@@ -436,7 +437,7 @@ export default function VisualizarPlanoProfessor() {
                 <div className="plano-doc">
                     <div className="topo-doc bloco-pequeno">
                         <div className="logo-central">
-                            <img src="/logo-professor.png" alt="Logo" />
+                            <img src={logoPlano} alt="Logo" />
                         </div>
                     </div>
 

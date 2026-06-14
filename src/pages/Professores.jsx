@@ -1,120 +1,160 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   listarProfessores,
+  listarComponentes,
+  listarEscolas,
+  listarTurmas,
   salvarProfessor,
   atualizarProfessor,
-  deletarProfessor,
-  listarEscolas,
-  listarComponentes,
-  listarTurmas
+  deletarProfessor
 } from "../services/api";
-import { Pencil, Trash2, X, Save, Plus, MinusCircle } from "lucide-react";
+import { ArrowLeft, MinusCircle, Pencil, Plus, Save, Trash2, X } from "lucide-react";
 import Toast from "./Toast";
 import "./professores.css";
+
+const estadoInicial = {
+  nome: "",
+  turno: "",
+  email: "",
+  senha: "",
+  atribuicoes: []
+};
+
+const atribuicaoInicial = {
+  escolaId: "",
+  componenteId: "",
+  ano: "",
+  turma: ""
+};
+
+const anosDisponiveis = ["1º", "2º", "3º", "4º", "5º", "6º", "7º", "8º", "9º"];
+const letrasTurmaDisponiveis = ["A", "B", "C", "D", "E", "F", "G"];
 
 export default function Professores() {
   const [professores, setProfessores] = useState([]);
   const [escolas, setEscolas] = useState([]);
   const [componentes, setComponentes] = useState([]);
   const [turmas, setTurmas] = useState([]);
+  const [modelo, setModelo] = useState(estadoInicial);
+  const [novaAtribuicao, setNovaAtribuicao] = useState(atribuicaoInicial);
   const [editandoId, setEditandoId] = useState(null);
-
-  const [modelo, setModelo] = useState({
-    nome: "",
-    turno: "",
-    escolas: [],
-    componentes: [],
-    turmas: [],
-    email: "",
-    senha: "",
-    atribuicoes: []
-  });
-
-  const [novaAtribuicao, setNovaAtribuicao] = useState({
-    escolaId: "",
-    componenteId: "",
-    ano: "",
-    turma: ""
-  });
-
+  const [formularioAberto, setFormularioAberto] = useState(false);
+  const [salvando, setSalvando] = useState(false);
   const [toast, setToast] = useState({
     show: false,
     mensagem: "",
     tipo: "sucesso"
   });
 
-  function showToast(mensagem, tipo = "sucesso") {
-    setToast({
-      show: true,
-      mensagem,
-      tipo
-    });
-  }
-
-  function fecharToast() {
-    setToast({
-      show: false,
-      mensagem: "",
-      tipo: "sucesso"
-    });
-  }
-
-  const anosDisponiveis = [
-    "1º",
-    "2º",
-    "3º",
-    "4º",
-    "5º",
-    "6º",
-    "7º",
-    "8º",
-    "9º"
-  ];
-
-  const letrasTurmaDisponiveis = ["A", "B", "C", "D", "E", "F", "G"];
-
   useEffect(() => {
+    async function carregarDados() {
+      try {
+        const [professoresData, escolasData, componentesData, turmasData] = await Promise.all([
+          listarProfessores(),
+          listarEscolas(),
+          listarComponentes(),
+          listarTurmas()
+        ]);
+
+        setProfessores(professoresData || []);
+        setEscolas(escolasData || []);
+        setComponentes(componentesData || []);
+        setTurmas(turmasData || []);
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+        showToast("Erro ao carregar dados do cadastro.", "erro");
+      }
+    }
+
     carregarDados();
   }, []);
 
-  async function carregarDados() {
-    try {
-      const [
-        professoresData,
-        escolasData,
-        componentesData,
-        turmasData
-      ] = await Promise.all([
-        listarProfessores(),
-        listarEscolas(),
-        listarComponentes(),
-        listarTurmas()
-      ]);
+  function showToast(mensagem, tipo = "sucesso") {
+    setToast({ show: true, mensagem, tipo });
+  }
 
+  function fecharToast() {
+    setToast({ show: false, mensagem: "", tipo: "sucesso" });
+  }
+
+  function normalizarAno(valor) {
+    return String(valor || "")
+      .replace("º", "")
+      .replace("ª", "")
+      .replace(/\s+/g, "")
+      .trim();
+  }
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setModelo((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function handleChangeAtribuicao(event) {
+    const { name, value } = event.target;
+    setNovaAtribuicao((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function limparFormulario() {
+    setModelo(estadoInicial);
+    setNovaAtribuicao(atribuicaoInicial);
+    setEditandoId(null);
+  }
+
+  async function recarregarProfessores() {
+    try {
+      const professoresData = await listarProfessores();
       setProfessores(professoresData || []);
-      setEscolas(escolasData || []);
-      setComponentes(componentesData || []);
-      setTurmas(turmasData || []);
     } catch (error) {
-      console.error("Erro ao carregar dados:", error);
-      showToast("Erro ao carregar dados.", "erro");
+      console.error("Erro ao recarregar professores:", error);
     }
   }
 
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setModelo((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+  function abrirCadastro() {
+    limparFormulario();
+    setFormularioAberto(true);
   }
 
-  function handleChangeAtribuicao(e) {
-    const { name, value } = e.target;
-    setNovaAtribuicao((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+  function voltarParaListagem() {
+    limparFormulario();
+    setFormularioAberto(false);
+  }
+
+  function editarProfessor(professor) {
+    setModelo({
+      nome: professor.nome || "",
+      turno: professor.turno || "",
+      email: professor.email || "",
+      senha: professor.senha || "",
+      atribuicoes: (professor.atribuicoes || []).map((item) => ({
+        escolaId: item.escola_id,
+        componenteId: item.componente_id,
+        turmaId: item.turma_id
+      }))
+    });
+    setNovaAtribuicao(atribuicaoInicial);
+    setEditandoId(professor.id);
+    setFormularioAberto(true);
+  }
+
+  async function excluirProfessor(id) {
+    const confirmar = window.confirm("Deseja realmente deletar este usuario?");
+    if (!confirmar) return;
+
+    try {
+      const resposta = await deletarProfessor(id);
+
+      if (resposta?.erro || resposta?.error) {
+        showToast(resposta.erro || resposta.error, "erro");
+        return;
+      }
+
+      showToast("Usuario deletado com sucesso.", "sucesso");
+      recarregarProfessores();
+    } catch (error) {
+      console.error("Erro ao deletar usuario:", error);
+      showToast("Erro ao deletar usuario.", "erro");
+    }
   }
 
   function adicionarAtribuicao() {
@@ -135,343 +175,44 @@ export default function Professores() {
     });
 
     if (!turmaEncontrada) {
-      showToast(`A turma ${ano}${turma} não foi encontrada no banco.`, "erro");
+      showToast(`A turma ${ano}${turma} nao foi encontrada no banco.`, "erro");
       return;
     }
 
-    const escolaIdNum = Number(escolaId);
-    const componenteIdNum = Number(componenteId);
+    const itemNovo = {
+      escolaId: Number(escolaId),
+      componenteId: Number(componenteId),
+      turmaId: Number(turmaEncontrada.id)
+    };
 
     setModelo((prev) => {
       const jaExiste = prev.atribuicoes.some(
         (item) =>
-          Number(item.escolaId) === escolaIdNum &&
-          Number(item.componenteId) === componenteIdNum &&
-          Number(item.turmaId) === Number(turmaEncontrada.id)
+          Number(item.escolaId) === itemNovo.escolaId &&
+          Number(item.componenteId) === itemNovo.componenteId &&
+          Number(item.turmaId) === itemNovo.turmaId
       );
 
       if (jaExiste) {
-        showToast("Essa atribuição já foi adicionada.", "erro");
+        showToast("Essa atribuicao ja foi adicionada.", "erro");
         return prev;
       }
 
       return {
         ...prev,
-        atribuicoes: [
-          ...prev.atribuicoes,
-          {
-            escolaId: escolaIdNum,
-            componenteId: componenteIdNum,
-            turmaId: Number(turmaEncontrada.id)
-          }
-        ]
+        atribuicoes: [...prev.atribuicoes, itemNovo]
       };
     });
 
-    setNovaAtribuicao({
-      escolaId: "",
-      componenteId: "",
-      ano: "",
-      turma: ""
-    });
+    setNovaAtribuicao(atribuicaoInicial);
   }
 
   function removerAtribuicao(index) {
     setModelo((prev) => ({
       ...prev,
-      atribuicoes: prev.atribuicoes.filter((_, i) => i !== index)
+      atribuicoes: prev.atribuicoes.filter((_, itemIndex) => itemIndex !== index)
     }));
   }
-
-  function handleChangeNovaTurma(e) {
-    const { name, value } = e.target;
-    setNovaTurma((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-  }
-
-  function normalizarAno(valor) {
-    return String(valor || "")
-      .replace("º", "")
-      .replace("ª", "")
-      .replace(/\s+/g, "")
-      .trim();
-  }
-
-  function adicionarEscola() {
-    if (!novaEscolaId) {
-      showToast("Selecione uma escola.", "erro");
-      return;
-    }
-
-    const escolaId = Number(novaEscolaId);
-
-    setModelo((prev) => {
-      if (prev.escolas.includes(escolaId)) {
-        showToast("Essa escola já foi adicionada.", "erro");
-        return prev;
-      }
-
-      return {
-        ...prev,
-        escolas: [...prev.escolas, escolaId]
-      };
-    });
-
-    setNovaEscolaId("");
-  }
-
-  function removerEscola(idEscola) {
-    setModelo((prev) => ({
-      ...prev,
-      escolas: prev.escolas.filter((id) => id !== idEscola)
-    }));
-  }
-
-  function adicionarComponente() {
-    if (!novoComponenteId) {
-      showToast("Selecione um componente.", "erro");
-      return;
-    }
-
-    const componenteId = Number(novoComponenteId);
-
-    setModelo((prev) => {
-      if (prev.componentes.includes(componenteId)) {
-        showToast("Esse componente já foi adicionado.", "erro");
-        return prev;
-      }
-
-      return {
-        ...prev,
-        componentes: [...prev.componentes, componenteId]
-      };
-    });
-
-    setNovoComponenteId("");
-  }
-
-  function removerComponente(idComponente) {
-    setModelo((prev) => ({
-      ...prev,
-      componentes: prev.componentes.filter((id) => id !== idComponente)
-    }));
-  }
-
-  function adicionarTurma() {
-    if (!novaTurma.ano || !novaTurma.turma) {
-      showToast("Selecione o ano e a turma.", "erro");
-      return;
-    }
-
-    const turmaEncontrada = turmas.find((item) => {
-      const anoItem = normalizarAno(item.ano);
-      const anoSelecionado = normalizarAno(novaTurma.ano);
-      return (
-        anoItem === anoSelecionado &&
-        String(item.turma).toUpperCase() === String(novaTurma.turma).toUpperCase()
-      );
-    });
-
-    if (!turmaEncontrada) {
-      showToast(`A turma ${novaTurma.ano}${novaTurma.turma} não foi encontrada no banco.`, "erro");
-      return;
-    }
-
-    setModelo((prev) => {
-      if (prev.turmas.includes(turmaEncontrada.id)) {
-        showToast("Essa turma já foi adicionada.", "erro");
-        return prev;
-      }
-
-      return {
-        ...prev,
-        turmas: [...prev.turmas, turmaEncontrada.id]
-      };
-    });
-
-    setNovaTurma({
-      ano: "",
-      turma: ""
-    });
-  }
-
-  function removerTurma(idTurma) {
-    setModelo((prev) => ({
-      ...prev,
-      turmas: prev.turmas.filter((id) => id !== idTurma)
-    }));
-  }
-
-  function limparFormulario() {
-    setModelo({
-      nome: "",
-      turno: "",
-      email: "",
-      senha: "",
-      atribuicoes: []
-    });
-
-    setNovaAtribuicao({
-      escolaId: "",
-      componenteId: "",
-      ano: "",
-      turma: ""
-    });
-
-    setEditandoId(null);
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-
-    let atribuicoesAtualizadas = [...modelo.atribuicoes];
-
-    if (
-      novaAtribuicao.escolaId &&
-      novaAtribuicao.componenteId &&
-      novaAtribuicao.ano &&
-      novaAtribuicao.turma
-    ) {
-      const turmaEncontrada = turmas.find((item) => {
-        const anoItem = normalizarAno(item.ano);
-        const anoSelecionado = normalizarAno(novaAtribuicao.ano);
-        return (
-          anoItem === anoSelecionado &&
-          String(item.turma).toUpperCase() === String(novaAtribuicao.turma).toUpperCase()
-        );
-      });
-
-      if (turmaEncontrada) {
-        const itemTemp = {
-          escolaId: Number(novaAtribuicao.escolaId),
-          componenteId: Number(novaAtribuicao.componenteId),
-          turmaId: Number(turmaEncontrada.id)
-        };
-
-        const jaExiste = atribuicoesAtualizadas.some(
-          (item) =>
-            Number(item.escolaId) === itemTemp.escolaId &&
-            Number(item.componenteId) === itemTemp.componenteId &&
-            Number(item.turmaId) === itemTemp.turmaId
-        );
-
-        if (!jaExiste) {
-          atribuicoesAtualizadas.push(itemTemp);
-        }
-      }
-    }
-
-    if (
-      !modelo.nome ||
-      !modelo.turno ||
-      !modelo.email ||
-      !modelo.senha ||
-      atribuicoesAtualizadas.length === 0
-    ) {
-      showToast("Preencha todos os campos obrigatórios.", "erro");
-      return;
-    }
-
-    const payload = {
-      nome: modelo.nome,
-      turno: modelo.turno,
-      email: modelo.email,
-      senha: modelo.senha,
-      atribuicoes: atribuicoesAtualizadas
-    };
-
-    try {
-      const resposta = editandoId
-        ? await atualizarProfessor(editandoId, payload)
-        : await salvarProfessor(payload);
-
-      if (resposta.erro || resposta.error) {
-        showToast(resposta.erro || resposta.error, "erro");
-        return;
-      }
-
-      showToast(
-        editandoId
-          ? "Professor atualizado com sucesso!"
-          : "Professor cadastrado com sucesso!",
-        "sucesso"
-      );
-
-      limparFormulario();
-      carregarDados();
-    } catch (error) {
-      console.error("Erro ao salvar professor:", error);
-      showToast("Erro ao salvar professor.", "erro");
-    }
-  }
-
-  function editarProfessor(professor) {
-    setModelo({
-      nome: professor.nome || "",
-      turno: professor.turno || "",
-      email: professor.email || "",
-      senha: professor.senha || "",
-      atribuicoes: (professor.atribuicoes || []).map((item) => ({
-        escolaId: item.escola_id,
-        componenteId: item.componente_id,
-        turmaId: item.turma_id
-      }))
-    });
-
-    setNovaAtribuicao({
-      escolaId: "",
-      componenteId: "",
-      ano: "",
-      turma: ""
-    });
-
-    setEditandoId(professor.id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  async function excluirProfessor(id) {
-    const confirmar = window.confirm("Deseja realmente excluir este professor?");
-    if (!confirmar) return;
-
-    try {
-      const resposta = await deletarProfessor(id);
-
-      if (resposta.erro || resposta.error) {
-        showToast(resposta.erro || resposta.error, "erro");
-        return;
-      }
-
-      if (editandoId === id) {
-        limparFormulario();
-      }
-
-      carregarDados();
-      showToast("Professor excluído com sucesso.", "sucesso");
-    } catch (error) {
-      console.error("Erro ao excluir professor:", error);
-      showToast("Erro ao excluir professor.", "erro");
-    }
-  }
-
-  const escolasSelecionadas = useMemo(() => {
-    return modelo.escolas
-      .map((idEscola) => escolas.find((item) => item.id === idEscola))
-      .filter(Boolean);
-  }, [modelo.escolas, escolas]);
-
-  const componentesSelecionados = useMemo(() => {
-    return modelo.componentes
-      .map((idComponente) => componentes.find((item) => item.id === idComponente))
-      .filter(Boolean);
-  }, [modelo.componentes, componentes]);
-
-  const turmasSelecionadas = useMemo(() => {
-    return modelo.turmas
-      .map((idTurma) => turmas.find((item) => item.id === idTurma))
-      .filter(Boolean);
-  }, [modelo.turmas, turmas]);
 
   const atribuicoesSelecionadas = useMemo(() => {
     return modelo.atribuicoes.map((item) => {
@@ -481,23 +222,163 @@ export default function Professores() {
 
       return {
         ...item,
-        escolaNome: escola?.nome || "Escola não encontrada",
-        componenteNome: componente?.nome || "Componente não encontrado",
-        turmaNome: turma?.nome || "Turma não encontrada"
+        escolaNome: escola?.nome || "Escola nao encontrada",
+        componenteNome: componente?.nome || "Componente nao encontrado",
+        turmaNome: turma?.nome || "Turma nao encontrada"
       };
     });
   }, [modelo.atribuicoes, escolas, componentes, turmas]);
 
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    if (!modelo.nome || !modelo.turno || !modelo.email || !modelo.senha) {
+      showToast("Preencha nome, turno, e-mail e senha.", "erro");
+      return;
+    }
+
+    if (modelo.atribuicoes.length === 0) {
+      showToast("Adicione pelo menos uma atribuicao.", "erro");
+      return;
+    }
+
+    setSalvando(true);
+
+    try {
+      const resposta = editandoId
+        ? await atualizarProfessor(editandoId, modelo)
+        : await salvarProfessor(modelo);
+
+      if (resposta.erro || resposta.error) {
+        showToast(resposta.erro || resposta.error, "erro");
+        return;
+      }
+
+      showToast(editandoId ? "Usuario atualizado com sucesso!" : "Usuario cadastrado com sucesso!", "sucesso");
+      limparFormulario();
+      setFormularioAberto(false);
+      recarregarProfessores();
+    } catch (error) {
+      console.error("Erro ao salvar usuario:", error);
+      showToast("Erro ao salvar usuario.", "erro");
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  if (!formularioAberto) {
+    return (
+      <div className="prof-container">
+        <div className="prof-card">
+          <div className="prof-lista-header">
+            <div>
+              <span className="prof-kicker">Usuarios</span>
+              <h1>Professores cadastrados</h1>
+              <p>Consulte os professores cadastrados e suas atribuicoes.</p>
+            </div>
+
+            <button type="button" className="btn-novo-usuario" onClick={abrirCadastro}>
+              <Plus size={18} />
+              Novo usuario
+            </button>
+          </div>
+
+          <div className="tabela-wrapper">
+            <table className="prof-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Turno</th>
+                  <th>Atribuicoes</th>
+                  <th>E-mail</th>
+                  <th>Acoes</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {professores.length > 0 ? (
+                  professores.map((professor) => (
+                    <tr key={professor.id}>
+                      <td data-label="Nome">{professor.nome}</td>
+                      <td data-label="Turno">{professor.turno || "-"}</td>
+                      <td data-label="Atribuicoes">
+                        {(professor.atribuicoes || []).length > 0
+                          ? professor.atribuicoes
+                              .map(
+                                (item) =>
+                                  `${item.escola_nome} - ${item.componente_nome} - ${item.turma_nome}`
+                              )
+                              .join(" | ")
+                          : "-"}
+                      </td>
+                      <td data-label="E-mail">{professor.email}</td>
+                      <td data-label="Acoes">
+                        <div className="acoes">
+                          <button
+                            type="button"
+                            className="btn-acao editar"
+                            onClick={() => editarProfessor(professor)}
+                            title="Editar usuario"
+                          >
+                            <Pencil size={18} />
+                          </button>
+
+                          <button
+                            type="button"
+                            className="btn-acao excluir"
+                            onClick={() => excluirProfessor(professor.id)}
+                            title="Deletar usuario"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="sem-registro">
+                      Nenhum professor cadastrado.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {toast.show && (
+          <Toast
+            mensagem={toast.mensagem}
+            tipo={toast.tipo}
+            onClose={fecharToast}
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="prof-container">
-      <div className="prof-card">
+      <div className="prof-card prof-card-formulario">
         <div className="prof-header">
-          <h1>Cadastro de Professores</h1>
+          <div>
+            <span className="prof-kicker">Usuarios</span>
+            <h1>{editandoId ? "Editar usuario" : "Cadastro de usuario"}</h1>
+            <p>{editandoId ? "Atualize os dados e atribuicoes deste professor." : "Cadastre professores e vincule suas atribuicoes por escola, componente, ano e turma."}</p>
+          </div>
 
-          <button type="button" className="btn-limpar" onClick={limparFormulario}>
-            <X size={18} />
-            Limpar
-          </button>
+          <div className="prof-header-acoes">
+            <button type="button" className="btn-voltar-cadastro" onClick={voltarParaListagem}>
+              <ArrowLeft size={18} />
+              Voltar
+            </button>
+
+            <button type="button" className="btn-limpar" onClick={limparFormulario}>
+              <X size={18} />
+              Limpar
+            </button>
+          </div>
         </div>
 
         <form className="prof-form" onSubmit={handleSubmit}>
@@ -524,10 +405,10 @@ export default function Professores() {
           </div>
 
           <div className="form-group full">
-            <label>Atribuições do Professor</label>
+            <label>Atribuicoes do professor</label>
 
             <div className="turma-builder">
-              <div className="turma-builder-grid" style={{ gridTemplateColumns: "repeat(4, 1fr) auto" }}>
+              <div className="turma-builder-grid">
                 <div className="form-group">
                   <label>Escola</label>
                   <select
@@ -593,11 +474,7 @@ export default function Professores() {
                 </div>
 
                 <div className="turma-btn-area">
-                  <button
-                    type="button"
-                    className="btn-add-turma"
-                    onClick={adicionarAtribuicao}
-                  >
+                  <button type="button" className="btn-add-turma" onClick={adicionarAtribuicao}>
                     <Plus size={18} />
                     Adicionar
                   </button>
@@ -607,9 +484,12 @@ export default function Professores() {
               <div className="turmas-selecionadas">
                 {atribuicoesSelecionadas.length > 0 ? (
                   atribuicoesSelecionadas.map((item, index) => (
-                    <div key={`${item.escolaId}-${item.componenteId}-${item.turmaId}`} className="turma-tag">
+                    <div
+                      key={`${item.escolaId}-${item.componenteId}-${item.turmaId}`}
+                      className="turma-tag"
+                    >
                       <span>
-                        {item.escolaNome} — {item.componenteNome} — {item.turmaNome}
+                        {item.escolaNome} - {item.componenteNome} - {item.turmaNome}
                       </span>
                       <button
                         type="button"
@@ -621,7 +501,7 @@ export default function Professores() {
                     </div>
                   ))
                 ) : (
-                  <div className="turma-vazia">Nenhuma atribuição adicionada.</div>
+                  <div className="turma-vazia">Nenhuma atribuicao adicionada.</div>
                 )}
               </div>
             </div>
@@ -650,78 +530,14 @@ export default function Professores() {
           </div>
 
           <div className="form-actions full">
-            <button type="submit" className="btn-salvar">
+            <button type="submit" className="btn-salvar" disabled={salvando}>
               <Save size={18} />
-              {editandoId ? "Atualizar Professor" : "Cadastrar"}
+              {salvando
+                ? editandoId ? "Atualizando..." : "Cadastrando..."
+                : editandoId ? "Atualizar usuario" : "Cadastrar usuario"}
             </button>
           </div>
         </form>
-      </div>
-
-      <div className="prof-card">
-        <h2>Professores Cadastrados</h2>
-
-        <div className="tabela-wrapper">
-          <table className="prof-table">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Turno</th>
-                <th>Atribuições</th>
-                <th>Componentes</th>
-                <th>E-mail</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {professores.length > 0 ? (
-                professores.map((professor) => (
-                  <tr key={professor.id}>
-                    <td>{professor.nome}</td>
-                    <td>{professor.turno}</td>
-                    <td>
-                      {(professor.atribuicoes || []).length > 0
-                        ? professor.atribuicoes
-                          .map(
-                            (item) =>
-                              `${item.escola_nome} — ${item.componente_nome} — ${item.turma_nome}`
-                          )
-                          .join(" | ")
-                        : "-"}
-                    </td>
-                    <td>{professor.email}</td>
-                    <td>
-                      <div className="acoes">
-                        <button
-                          type="button"
-                          className="btn-acao editar"
-                          onClick={() => editarProfessor(professor)}
-                        >
-                          <Pencil size={18} />
-                        </button>
-
-                        <button
-                          type="button"
-                          className="btn-acao excluir"
-                          onClick={() => excluirProfessor(professor.id)}
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" className="sem-registro">
-                    Nenhum professor cadastrado.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
       </div>
 
       {toast.show && (

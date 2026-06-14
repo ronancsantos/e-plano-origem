@@ -95,18 +95,13 @@
 
 .logo-central {
   display: flex;
-  width: 86px;
-  height: 86px;
   align-items: center;
   justify-content: center;
-  border: 1px solid #dbe7e4;
-  border-radius: 8px;
-  background: #f8fbfa;
 }
 
 .logo-central img {
-  max-width: 72px;
-  max-height: 72px;
+  max-width: 180px;
+  max-height: 90px;
   object-fit: contain;
 }
 
@@ -388,13 +383,13 @@
   }
 
   .logo-central {
-    width: 68px !important;
-    height: 68px !important;
+    width: auto !important;
+    height: auto !important;
   }
 
   .logo-central img {
-    max-width: 58px !important;
-    max-height: 58px !important;
+    max-width: 160px !important;
+    max-height: 80px !important;
   }
 
   .cabecalho-d,

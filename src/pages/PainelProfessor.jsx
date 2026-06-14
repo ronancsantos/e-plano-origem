@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { atualizarFotoProfessor, listarModelosProfessor } from "../services/api";
+import { atualizarFotoProfessor, buscarProfessor, listarModelosProfessor } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import {
   LogOut,
@@ -27,6 +27,7 @@ export default function AbaProfessor() {
   const navigate = useNavigate();
 
   const [modelos, setModelos] = useState([]);
+  const [professorDetalhe, setProfessorDetalhe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [menuAtivo, setMenuAtivo] = useState("inicio");
   const [sidebarExpandida, setSidebarExpandida] = useState(true);
@@ -129,7 +130,10 @@ export default function AbaProfessor() {
     try {
       if (!usuario?.id) return;
 
-      const data = await listarModelosProfessor(usuario.id);
+      const [data, professorData] = await Promise.all([
+        listarModelosProfessor(usuario.id),
+        buscarProfessor(usuario.id)
+      ]);
 
       const dataNormalizada = Array.isArray(data)
         ? data.map((p) => ({
@@ -140,9 +144,11 @@ export default function AbaProfessor() {
         : [];
 
       setModelos(dataNormalizada);
+      setProfessorDetalhe(professorData || null);
     } catch (error) {
       console.error("Erro ao carregar modelos do professor:", error);
       setModelos([]);
+      setProfessorDetalhe(null);
     } finally {
       setLoading(false);
     }
@@ -377,11 +383,38 @@ export default function AbaProfessor() {
   }
 
   function renderPerfil() {
+    const atribuicoes = Array.isArray(professorDetalhe?.atribuicoes)
+      ? professorDetalhe.atribuicoes
+      : [];
+
+    const atuacoesFormatadas = atribuicoes.map((item) => ({
+      escola: item.escola_nome || "-",
+      componente: item.componente_nome || "-",
+      ano: item.turma_ano || "-",
+      turma: String(item.turma_nome || "").replace(/^.*Turma\s*/i, "") || "-"
+    }));
+
     return (
       <div className="professor-card">
         <div className="secao-header">
-          <h2>Perfil do Professor</h2>
-          <p>Informações da sua conta no sistema.</p>
+          <h2>Perfil</h2>
+        </div>
+
+        <div className="perfil-grid perfil-grid-limpo">
+          <div className="perfil-item">
+            <span>Nome</span>
+            <strong>{usuario?.nome || "-"}</strong>
+          </div>
+
+          <div className="perfil-item">
+            <span>E-mail</span>
+            <strong>{usuario?.email || "-"}</strong>
+          </div>
+
+          <div className="perfil-item">
+            <span>Perfil</span>
+            <strong>{usuario?.perfil || usuario?.tipo || "professor"}</strong>
+          </div>
         </div>
 
         <div className="perfil-foto-card">
@@ -407,21 +440,36 @@ export default function AbaProfessor() {
           </div>
         </div>
 
-        <div className="perfil-grid">
-          <div className="perfil-item">
-            <span>Nome</span>
-            <strong>{usuario?.nome || "-"}</strong>
-          </div>
+        <div className="secao-header perfil-atuacoes-header">
+          <h2>Atuação</h2>
+     
+        </div>
 
-          <div className="perfil-item">
-            <span>E-mail</span>
-            <strong>{usuario?.email || "-"}</strong>
-          </div>
-
-          <div className="perfil-item">
-            <span>Perfil</span>
-            <strong>{usuario?.perfil || usuario?.tipo || "professor"}</strong>
-          </div>
+        <div className="perfil-atuacoes-tabela-wrap">
+          {atuacoesFormatadas.length > 0 ? (
+            <table className="perfil-atuacoes-tabela">
+              <thead>
+                <tr>
+                  <th>Escola</th>
+                  <th>Componente</th>
+                  <th>Ano</th>
+                  <th>Turma</th>
+                </tr>
+              </thead>
+              <tbody>
+                {atuacoesFormatadas.map((atuacao, index) => (
+                  <tr key={`${atuacao.escola}-${atuacao.componente}-${atuacao.ano}-${atuacao.turma}-${index}`}>
+                    <td data-label="Escola">{atuacao.escola}</td>
+                    <td data-label="Componente">{atuacao.componente}</td>
+                    <td data-label="Ano">{atuacao.ano}</td>
+                    <td data-label="Turma">Turma {atuacao.turma}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="perfil-atuacoes-vazio">-</div>
+          )}
         </div>
       </div>
     );

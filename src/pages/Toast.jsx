@@ -1,19 +1,25 @@
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import "./toast.css";
 
-export default function Toast({ mensagem, tipo, onClose }) {
+export default function Toast({ mensagem, tipo = "sucesso", onClose }) {
   const [exit, setExit] = useState(false);
 
+  const handleClose = () => {
+    setExit(true);
+    setTimeout(() => {
+      if (typeof onClose === "function") onClose();
+    }, 300);
+  };
+
   useEffect(() => {
-    if (!mensagem) return;
+    if (!mensagem) return undefined;
 
-    // Fecha automaticamente após 3s
-    const timer = setTimeout(() => handleClose(), 3000);
-
-    // Fecha com Enter
-    const handleEnter = (e) => {
-      if (e.key === "Enter") handleClose();
+    const timer = setTimeout(handleClose, 3000);
+    const handleEnter = (event) => {
+      if (event.key === "Enter") handleClose();
     };
+
     window.addEventListener("keydown", handleEnter);
 
     return () => {
@@ -22,27 +28,25 @@ export default function Toast({ mensagem, tipo, onClose }) {
     };
   }, [mensagem]);
 
-  // Resetar exit toda vez que a mensagem mudar
   useEffect(() => {
     if (mensagem) setExit(false);
   }, [mensagem]);
 
-  const handleClose = () => {
-    setExit(true);
-    setTimeout(() => onClose(), 400); // espera a animação de saída
-  };
-
   if (!mensagem) return null;
 
+  const sucesso = tipo === "sucesso";
+
   return (
-    <div className={`popup-erro ${tipo} ${exit ? "exit" : ""}`}>
-      {tipo === "sucesso" ? (
-        <CheckCircle2 color="#16a34a" size={24} />
-      ) : (
-        <AlertCircle color="#f87171" size={24} />
-      )}
-      <p>{mensagem}</p>
-      <button onClick={handleClose}>OK</button>
+    <div className={`toast-container ${sucesso ? "sucesso" : "erro"} ${exit ? "exit" : ""}`} role="status" aria-live="polite">
+      <span className="toast-icon" aria-hidden="true">
+        {sucesso ? <CheckCircle2 size={22} /> : <AlertCircle size={22} />}
+      </span>
+
+      <p className="toast-message">{mensagem}</p>
+
+      <button className="toast-close" type="button" onClick={handleClose} aria-label="Fechar notificacao">
+        OK
+      </button>
     </div>
   );
 }

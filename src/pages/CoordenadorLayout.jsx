@@ -55,7 +55,11 @@ export default function CoordenadorLayout({ children }) {
     : sidebarExpandida
       ? logoGrande
       : logoMini;
-  const planosAtivo = location.pathname === "/planos" || location.pathname.startsWith("/coordenador");
+  const planosAtivo =
+    location.pathname === "/planos" ||
+    location.pathname.startsWith("/coordenador") ||
+    location.pathname.startsWith("/editar/") ||
+    location.pathname.startsWith("/visualizar/");
 
   return (
     <div className="painel-professor-layout">

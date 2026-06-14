@@ -199,7 +199,7 @@
 
 .lista {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
   max-height: min(48vh, 460px);
   overflow-y: auto;
@@ -209,15 +209,39 @@
   background: #f8fafc;
 }
 
-.lista > div {
-  display: contents;
-}
-
 .lista h3 {
   grid-column: 1 / -1;
   margin: 8px 0 4px;
   color: #475569;
   font-size: 13px;
+}
+
+.habilidade-opcao {
+  align-items: flex-start;
+}
+
+.habilidade-codigo {
+  flex: 0 0 auto;
+  border-radius: 8px;
+  padding: 2px 8px;
+  background: #e0f2fe;
+  color: #075985;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.habilidade-descricao {
+  min-width: 0;
+}
+
+.lista-vazia {
+  margin: 0;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 14px;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 14px;
 }
 
 .box label {

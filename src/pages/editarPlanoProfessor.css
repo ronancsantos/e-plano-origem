@@ -85,7 +85,13 @@
 }
 
 .editar-plano-intro > div {
-  max-width: 720px;
+  flex: 1 1 auto;
+  max-width: none;
+}
+
+.editar-plano-intro .btn-voltar {
+  flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .editar-plano-page form {
@@ -159,6 +165,7 @@
 
 .editar-plano-page .lista {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 10px;
   max-height: 390px;
   margin: 14px 0;
@@ -186,6 +193,11 @@
     border-color 0.2s ease,
     box-shadow 0.2s ease,
     transform 0.2s ease;
+}
+
+.editar-plano-page .lista label {
+  width: 100%;
+  margin-bottom: 0;
 }
 
 .editar-plano-page .lista label:hover,
@@ -295,6 +307,19 @@
 
 .editar-plano-page .btn-right {
   margin-left: auto;
+}
+
+.editar-plano-page .btn-etapa {
+  min-width: 132px;
+  height: 44px;
+  border-radius: 14px;
+  padding: 10px 16px;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+.editar-plano-page .btn-etapa svg {
+  flex: 0 0 auto;
 }
 
 .editar-plano-page .btn-margem {

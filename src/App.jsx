@@ -94,7 +94,9 @@ export default function App() {
             path="/editar/:id"
             element={
               <ProtectedRoute perfisPermitidos={["admin", "coordenador"]}>
-                <EditarPlano />
+                <CoordenadorLayout>
+                  <EditarPlano />
+                </CoordenadorLayout>
               </ProtectedRoute>
             }
           />
@@ -103,7 +105,9 @@ export default function App() {
             path="/visualizar/:id"
             element={
               <ProtectedRoute perfisPermitidos={["admin", "coordenador"]}>
-                <VisualizarPlano />
+                <CoordenadorLayout>
+                  <VisualizarPlano />
+                </CoordenadorLayout>
               </ProtectedRoute>
             }
           />

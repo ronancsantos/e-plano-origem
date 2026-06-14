@@ -86,7 +86,7 @@ export default function Coordenador() {
 
   useEffect(() => {
     if (modelo.componente && modelo.ano) {
-      listarBNCC(modelo.componente, modelo.ano.replace("º", "")).then(setBncc);
+      listarBNCC(modelo.componente, String(modelo.ano).replace(/\D/g, "")).then(setBncc);
     }
   }, [modelo.componente, modelo.ano]);
 
@@ -157,6 +157,44 @@ export default function Coordenador() {
     });
     return [...new Set(objs)];
   };
+
+  useEffect(() => {
+    if (etapa !== 3) return;
+
+    const objetos = objetosFiltrados();
+    const mesmosObjetos =
+      objetos.length === modelo.objetos.length &&
+      objetos.every((objeto) => modelo.objetos.includes(objeto));
+
+    if (!mesmosObjetos) {
+      setModelo((prev) => ({ ...prev, objetos }));
+    }
+  }, [etapa, modelo.habilidades, bncc]);
+
+  const normalizarTextoBusca = (valor) =>
+    String(valor || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+  const habilidadeCombinaBusca = (habilidade) => {
+    const termo = normalizarTextoBusca(busca.trim());
+    if (!termo) return true;
+
+    return [habilidade.codigo, habilidade.descricao].some((valor) =>
+      normalizarTextoBusca(valor).includes(termo)
+    );
+  };
+
+  const habilidadesFiltradas = [
+    ...new Map(
+      Object.values(bncc)
+        .flatMap((objetos) => Object.values(objetos))
+        .flat()
+        .filter(habilidadeCombinaBusca)
+        .map((habilidade) => [habilidade.codigo, habilidade])
+    ).values()
+  ];
 
   const handleSalvar = async () => {
     if (!etapaCompleta(5)) {
@@ -367,28 +405,28 @@ export default function Coordenador() {
       {etapa === 2 && (
         <>
           <h2>Habilidades</h2>
-          <input placeholder="Buscar habilidade..." onChange={(e) => setBusca(e.target.value)} />
+          <input
+            value={busca}
+            placeholder="Buscar por codigo ou habilidade..."
+            onChange={(e) => setBusca(e.target.value)}
+          />
 
           <div className="lista">
-            {Object.entries(bncc).map(([u, objs]) => (
-              <div key={u}>
-                <h3>{u}</h3>
-                {Object.entries(objs).map(([o, habs]) =>
-                  habs
-                    .filter((h) => h.descricao.toLowerCase().includes(busca.toLowerCase()))
-                    .map((h) => (
-                      <label key={h.codigo}>
-                        <input
-                          type="checkbox"
-                          checked={modelo.habilidades.includes(h.codigo)}
-                          onChange={() => toggle("habilidades", h.codigo)}
-                        />
-                        {h.codigo}
-                      </label>
-                    ))
-                )}
-              </div>
-            ))}
+            {habilidadesFiltradas.length > 0 ? (
+              habilidadesFiltradas.map((h) => (
+                <label key={h.codigo} className="habilidade-opcao">
+                  <input
+                    type="checkbox"
+                    checked={modelo.habilidades.includes(h.codigo)}
+                    onChange={() => toggle("habilidades", h.codigo)}
+                  />
+                  <span className="habilidade-codigo">{h.codigo}</span>
+                  <span className="habilidade-descricao">{h.descricao}</span>
+                </label>
+              ))
+            ) : (
+              <p className="lista-vazia">Nenhuma habilidade encontrada.</p>
+            )}
           </div>
           <button className="btn btn-success" onClick={selecionarTodasHabilidades}><CopyCheck color="#ffff" size={15}/>Selecionar todos</button>
           <button className="btn btn-danger" onClick={() => setModelo({ ...modelo, habilidades: [] })}><CopyX color="#ffff" size={15}/>Desmarcar todos</button>

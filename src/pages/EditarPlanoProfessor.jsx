@@ -771,10 +771,11 @@ export default function EditarPlanoProfessor() {
                                 <div className="acoes">
                                     <button
                                         type="button"
-                                        className="btn btn-primary"
+                                        className="btn btn-primary btn-etapa btn-right"
                                         onClick={validarEtapa1}
                                     >
-                                        <CircleArrowRight color="#ffffff" size={30} />
+                                        Próximo
+                                        <CircleArrowRight color="#ffffff" size={22} />
                                     </button>
                                 </div>
                             </>
@@ -816,17 +817,19 @@ export default function EditarPlanoProfessor() {
                                 <div className="acoes">
                                     <button
                                         type="button"
-                                        className="btn btn-info"
+                                        className="btn btn-info btn-etapa"
                                         onClick={() => setEtapa(1)}
                                     >
-                                        <CircleArrowLeft color="#ffffff" size={30} />
+                                        <CircleArrowLeft color="#ffffff" size={22} />
+                                        Anterior
                                     </button>
                                     <button
                                         type="button"
-                                        className="btn btn-primary"
+                                        className="btn btn-primary btn-etapa"
                                         onClick={() => setEtapa(3)}
                                     >
-                                        <CircleArrowRight color="#ffffff" size={30} />
+                                        Próximo
+                                        <CircleArrowRight color="#ffffff" size={22} />
                                     </button>
                                 </div>
                             </>
@@ -893,17 +896,19 @@ export default function EditarPlanoProfessor() {
                                 <div className="acoes">
                                     <button
                                         type="button"
-                                        className="btn btn-info"
+                                        className="btn btn-info btn-etapa"
                                         onClick={() => setEtapa(2)}
                                     >
-                                        <CircleArrowLeft color="#ffffff" size={30} />
+                                        <CircleArrowLeft color="#ffffff" size={22} />
+                                        Anterior
                                     </button>
                                     <button
                                         type="button"
-                                        className="btn btn-primary"
+                                        className="btn btn-primary btn-etapa"
                                         onClick={() => setEtapa(4)}
                                     >
-                                        <CircleArrowRight color="#ffffff" size={30} />
+                                        Próximo
+                                        <CircleArrowRight color="#ffffff" size={22} />
                                     </button>
                                 </div>
                             </>
@@ -941,18 +946,20 @@ export default function EditarPlanoProfessor() {
                                 <div className="acoes">
                                     <button
                                         type="button"
-                                        className="btn btn-info"
+                                        className="btn btn-info btn-etapa"
                                         onClick={() => setEtapa(3)}
                                     >
-                                        <CircleArrowLeft color="#ffffff" size={30} />
+                                        <CircleArrowLeft color="#ffffff" size={22} />
+                                        Anterior
                                     </button>
 
                                     <button
                                         type="button"
-                                        className="btn btn-primary"
+                                        className="btn btn-primary btn-etapa"
                                         onClick={() => setEtapa(5)}
                                     >
-                                        <CircleArrowRight color="#ffffff" size={30} />
+                                        Próximo
+                                        <CircleArrowRight color="#ffffff" size={22} />
                                     </button>
                                 </div>
                             </>
