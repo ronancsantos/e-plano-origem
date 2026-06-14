@@ -105,15 +105,52 @@ const normalizarTexto = (valor) =>
     .replace(/_/g, " ")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 
-const normalizarAno = (valor) =>
-  String(valor || "")
+const normalizarComponente = (valor) => {
+  const texto = normalizarTexto(valor);
+
+  const equivalencias = {
+    "lingua portuguesa": "lingua_portuguesa",
+    "lp leitura": "lp_leitura",
+    "lp leitura e oralidade": "lp_leitura",
+    "lp eixo de leitura e oralidade": "lp_leitura",
+    "lp producao oralidade": "lp_producao_oralidade",
+    "lp producao de texto oralidade": "lp_producao_oralidade",
+    "lp eixo de producao de texto oralidade": "lp_producao_oralidade",
+    "lp analise linguistica e semiotica": "lp_analise_linguistica_e_Semiotica",
+    "lp eixo de analise linguistica e semiotica": "lp_analise_linguistica_e_Semiotica",
+    arte: "arte",
+    "educacao fisica": "educacao_fisica",
+    "lingua inglesa": "lingua_inglesa",
+    matematica: "matematica",
+    ciencias: "ciencias",
+    geografia: "geografia",
+    historia: "historia",
+    "ensino religioso": "ensino_religioso",
+    computacao: "computacao"
+  };
+
+  return equivalencias[texto] || texto;
+};
+
+const normalizarAno = (valor) => {
+  const texto = String(valor || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+
+  const numeroAno = texto.match(/\d+/)?.[0];
+  if (numeroAno) return numeroAno;
+
+  return texto
     .replace(/º/g, "")
     .replace(/ª/g, "")
-    .replace(/\s+/g, "")
-    .trim();
+    .replace(/\s+/g, "");
+};
 
 const statusEhConcluido = (valor) => {
   const s = String(valor || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
@@ -647,10 +684,10 @@ app.get("/professores/:id/modelos", async (req, res) => {
     const turmasAnoMap = new Map((turmas || []).map((item) => [item.id, item.ano]));
 
     const modelosFiltrados = (planos || []).filter((plano) => {
-      const componentePlano = normalizarTexto(plano.componente);
+      const componentePlano = normalizarComponente(plano.componente);
       const anoPlano = normalizarAno(plano.ano);
       return (atuacoes || []).some((atuacao) => {
-        const componenteAtuacao = normalizarTexto(componentesMap.get(atuacao.componente_id) || "");
+        const componenteAtuacao = normalizarComponente(componentesMap.get(atuacao.componente_id) || "");
         const anoAtuacao = normalizarAno(turmasAnoMap.get(atuacao.turma_id) || "");
         return componenteAtuacao === componentePlano && anoAtuacao === anoPlano;
       });
@@ -751,10 +788,10 @@ app.get("/dashboard/coordenador", async (req, res) => {
       const modelosCompativeis = [];
       const idsJaAdicionados = new Set();
       (modelosEnviados || []).forEach((modelo) => {
-        const componenteModelo = normalizarTexto(modelo.componente);
+        const componenteModelo = normalizarComponente(modelo.componente);
         const anoModelo = normalizarAno(modelo.ano);
         const compativel = (professor.atribuicoes || []).some((atribuicao) => {
-          const componenteAtribuicao = normalizarTexto(atribuicao.componente_nome);
+          const componenteAtribuicao = normalizarComponente(atribuicao.componente_nome);
           const anoAtribuicao = normalizarAno(atribuicao.turma_ano);
           return componenteAtribuicao === componenteModelo && anoAtribuicao === anoModelo;
         });

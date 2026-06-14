@@ -67,9 +67,9 @@ export default function VisualizarPlanoProfessor() {
 
     const componentesCH25 = [
         "lingua_portuguesa",
-        "lp_leitura_e_oralidade",
-        "lp_producao_de_texto_e_oralidade",
-        "lp_analise_linguistica_e_semiotica"
+        "lp_leitura",
+        "lp_producao_oralidade",
+        "lp_analise_linguistica_e_Semiotica"
     ];
 
     const dados = plano || modelo || {};

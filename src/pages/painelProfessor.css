@@ -289,6 +289,11 @@
   box-shadow: var(--prof-shadow);
 }
 
+.conteudo-professor > .professor-card {
+  display: block;
+  width: 100%;
+}
+
 .secao-header {
   margin-bottom: 18px;
 }
@@ -386,6 +391,7 @@
 /* Plan cards */
 .cards-modelos {
   display: flex;
+  width: 100%;
   flex-direction: column;
   gap: 18px;
 }
@@ -393,6 +399,7 @@
 .modelo-card {
   display: flex;
   width: 100%;
+  max-width: none;
   flex-direction: column;
   gap: 18px;
   border: 1px solid var(--prof-border);
