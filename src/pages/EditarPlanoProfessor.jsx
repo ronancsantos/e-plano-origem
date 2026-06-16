@@ -135,7 +135,10 @@ export default function EditarPlanoProfessor() {
         "Observação e Participação em Leitura",
         "Observação e Participação",
         "Exercícios escritos",
+        "Rubricas",
         "Atividade Oral",
+        "Seminário",
+        "Relatório",
         "Avaliação por pares em produção textual",
         "Atividade interpretativa",
         "Participação em debates e roda de leitura",
@@ -157,7 +160,8 @@ export default function EditarPlanoProfessor() {
         "Ditada",
         "Projeção da atividade",
         "Jogos",
-        "Links"
+        "Links",
+
     ];
 
     const metodologiasPadrao = [
@@ -169,7 +173,17 @@ export default function EditarPlanoProfessor() {
         "Ensino Hibrido",
         "Design Thinking",
         "STEAM",
-        "Cultura Maker"
+        "Cultura Maker",
+        "Caça ao tesouro pedagógica",
+        "Escape Room Educacional",
+        "Aprendizagem Baseada em Problemas (ABP/PBL)",
+        "Aprendizagem Baseada em Desafios (Challenge-Based Learning)",
+        "Aprendizagem Baseada em Mistérios (Mystery-Based Learning)",
+        "Trilha de pistas ou Circuito investigativo",
+        "RPG Educacional",
+        "Detetive Literário",
+        "Storytelling Investigativo",
+        "Sala de Redação Investigativa",
     ];
 
     const recursosMetodologiaPadrao = [
@@ -183,7 +197,14 @@ export default function EditarPlanoProfessor() {
         "Materiais concretos",
         "Áudios",
         "Cartazes",
-        "Pesquisas na internet"
+        "Pesquisas na internet",
+        "Revistas",
+        "Computador",
+        "Notebook",
+        "Smartphone",
+        "Tablet",
+        "Smart TV",
+
     ];
 
     const opcoesInstrumentos = (modeloBase?.instrumentos && modeloBase.instrumentos.length > 0)

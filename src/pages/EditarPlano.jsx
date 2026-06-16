@@ -479,7 +479,7 @@ export default function EditarPlano() {
 
       <section className="editar-grid-secoes">
         <div className="editar-card">
-          <h2>Avaliacao</h2>
+          <h2>Avaliação</h2>
 
           <h3>Instrumentos avaliativos</h3>
           {renderCheckboxLista("instrumentos", opcoesInstrumentos)}
@@ -523,7 +523,7 @@ export default function EditarPlano() {
       </section>
 
       <section className="editar-card">
-        <h2>Complementos pedagogicos</h2>
+        <h2>Complementos pedagógicos</h2>
         <div className="editar-form-grid editar-form-grid-dupla">
           <label>
             <span>Campo de atuacao</span>
@@ -535,7 +535,7 @@ export default function EditarPlano() {
           </label>
 
           <label>
-            <span>Generos sugeridos</span>
+            <span>Gêneros sugeridos</span>
             <textarea
               value={form.generos.join("\n")}
               onChange={(e) => atualizarTextoLista("generos", e.target.value)}

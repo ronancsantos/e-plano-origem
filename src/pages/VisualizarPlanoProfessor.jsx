@@ -7,6 +7,32 @@ import jsPDF from "jspdf";
 import "./visualizarProf.css";
 import logoPlano from "./logo-plano.png";
 
+async function carregarImagemDataUrl(src) {
+    try {
+        const resposta = await fetch(src);
+        const blob = await resposta.blob();
+
+        return new Promise((resolve, reject) => {
+            const leitor = new FileReader();
+            leitor.onloadend = () => {
+                const imagem = new Image();
+                imagem.onload = () => resolve({
+                    dataUrl: leitor.result,
+                    largura: imagem.naturalWidth,
+                    altura: imagem.naturalHeight
+                });
+                imagem.onerror = reject;
+                imagem.src = leitor.result;
+            };
+            leitor.onerror = reject;
+            leitor.readAsDataURL(blob);
+        });
+    } catch (error) {
+        console.error("Erro ao carregar logo do PDF:", error);
+        return null;
+    }
+}
+
 export default function VisualizarPlanoProfessor() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -89,8 +115,35 @@ export default function VisualizarPlanoProfessor() {
             .replace(/_/g, " ")
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]+/g, " ")
             .replace(/\s+/g, " ")
             .trim();
+    }
+
+    function normalizarComponente(valor) {
+        const texto = normalizarTexto(valor);
+        const equivalencias = {
+            "lingua portuguesa": "lingua_portuguesa",
+            "lp leitura": "lp_leitura",
+            "lp leitura e oralidade": "lp_leitura",
+            "lp eixo de leitura e oralidade": "lp_leitura",
+            "lp producao oralidade": "lp_producao_oralidade",
+            "lp producao de texto oralidade": "lp_producao_oralidade",
+            "lp eixo de producao de texto oralidade": "lp_producao_oralidade",
+            "lp analise linguistica e semiotica": "lp_analise_linguistica_e_Semiotica",
+            "lp eixo de analise linguistica e semiotica": "lp_analise_linguistica_e_Semiotica",
+            arte: "arte",
+            "educacao fisica": "educacao_fisica",
+            "lingua inglesa": "lingua_inglesa",
+            matematica: "matematica",
+            ciencias: "ciencias",
+            geografia: "geografia",
+            historia: "historia",
+            "ensino religioso": "ensino_religioso",
+            computacao: "computacao"
+        };
+
+        return equivalencias[texto] || texto;
     }
 
     function normalizarAno(valor) {
@@ -98,32 +151,82 @@ export default function VisualizarPlanoProfessor() {
         return numero.trim();
     }
 
+    function formatarAnoTurma(valor) {
+        const ano = normalizarAno(valor);
+        return ano ? `${ano}º` : "";
+    }
+
+    function formatarTurma(atribuicao) {
+        const ano = formatarAnoTurma(atribuicao?.turma_ano || dados.ano);
+        const turmaNome = String(atribuicao?.turma_nome || "").trim();
+        const turmaMatch = turmaNome.match(/turma\s*([a-z0-9]+)$/i);
+        const letraTurma = turmaMatch?.[1] || turmaNome.split("-").pop()?.replace(/turma/i, "").trim() || "";
+
+        return [ano, letraTurma].filter(Boolean).join(" ").trim() || "-";
+    }
+
+    function adicionarEscolaNoMapa(mapa, atribuicao) {
+        if (!atribuicao?.escola_nome) return;
+
+        const chave = atribuicao.escola_id || atribuicao.escola_nome;
+        const escolaAtual = mapa.get(chave) || {
+            escola: atribuicao.escola_nome,
+            turmasMap: new Map()
+        };
+        const turma = formatarTurma(atribuicao);
+
+        if (turma && turma !== "-") {
+            escolaAtual.turmasMap.set(turma, turma);
+        }
+
+        mapa.set(chave, escolaAtual);
+    }
+
     const escolasDocumento = (() => {
-        const componentePlano = normalizarTexto(componenteCurricular);
+        const componentePlano = normalizarComponente(dados.componente || componenteCurricular);
         const anoPlano = normalizarAno(dados.ano);
+        const atribuicoes = professorDetalhe?.atribuicoes || [];
         const escolasMap = new Map();
 
-        (professorDetalhe?.atribuicoes || []).forEach((atribuicao) => {
-            const componenteAtribuicao = normalizarTexto(atribuicao.componente_nome);
+        atribuicoes.forEach((atribuicao) => {
+            const componenteAtribuicao = normalizarComponente(atribuicao.componente_nome);
             const anoAtribuicao = normalizarAno(atribuicao.turma_ano || atribuicao.turma_nome);
 
             if (
                 componenteAtribuicao === componentePlano &&
-                anoAtribuicao === anoPlano &&
-                atribuicao.escola_nome
+                anoAtribuicao === anoPlano
             ) {
-                escolasMap.set(atribuicao.escola_id || atribuicao.escola_nome, atribuicao.escola_nome);
+                adicionarEscolaNoMapa(escolasMap, atribuicao);
             }
         });
 
-        const escolas = Array.from(escolasMap.values());
+        if (escolasMap.size === 0) {
+            atribuicoes.forEach((atribuicao) => {
+                const anoAtribuicao = normalizarAno(atribuicao.turma_ano || atribuicao.turma_nome);
+
+                if (anoAtribuicao === anoPlano) {
+                    adicionarEscolaNoMapa(escolasMap, atribuicao);
+                }
+            });
+        }
+
+        const escolas = Array.from(escolasMap.values())
+            .filter((item) => item?.escola)
+            .map((item) => ({
+                escola: item.escola,
+                turmas: Array.from(item.turmasMap.values())
+            }));
+        const escolaFallback = dados.escola_nome || dados.escola || usuario?.escola_nome || usuario?.escola;
 
         return escolas.length > 0
             ? escolas
-            : [dados.escola || usuario?.escola || "Estabelecimento de Ensino"];
+            : [{ escola: escolaFallback || "-", turmas: [] }];
     })();
 
-    const estabelecimento = escolasDocumento[0];
+    const documentoAtual = escolasDocumento[0] || { escola: "-", turmas: [] };
+    const estabelecimento = documentoAtual.escola;
+    const turmasDocumento = documentoAtual.turmas;
+    const turmasTexto = turmasDocumento.length > 0 ? turmasDocumento.join(", ") : "-";
 
     function montarMapaHabilidades() {
         const mapa = {};
@@ -175,7 +278,7 @@ export default function VisualizarPlanoProfessor() {
             .replace(/^_|_$/g, "") || "plano_professor";
     }
 
-    function gerarDocumentoPdf() {
+    function gerarDocumentoPdf(logoInfo = null) {
         const pdf = new jsPDF("p", "mm", "a4");
         const paginaLargura = pdf.internal.pageSize.getWidth();
         const paginaAltura = pdf.internal.pageSize.getHeight();
@@ -209,6 +312,17 @@ export default function VisualizarPlanoProfessor() {
             return pdf.splitTextToSize(textoSeguro(texto), largura);
         }
 
+        function adicionarLogoDocumento() {
+            if (!logoInfo?.dataUrl || !logoInfo?.largura || !logoInfo?.altura) return;
+
+            const larguraLogo = 42;
+            const alturaLogo = larguraLogo * (logoInfo.altura / logoInfo.largura);
+
+            garantirEspaco(alturaLogo + 8);
+            pdf.addImage(logoInfo.dataUrl, "PNG", paginaLargura / 2 - larguraLogo / 2, y, larguraLogo, alturaLogo);
+            y += alturaLogo + 8;
+        }
+
         function adicionarTituloDocumento() {
             pdf.setFillColor(...verde);
             pdf.rect(margemX, y, larguraConteudo, 12, "F");
@@ -236,9 +350,46 @@ export default function VisualizarPlanoProfessor() {
             y += altura;
         }
 
-        function adicionarCabecalho(escolaNome) {
-            adicionarCampo("Estabelecimento de Ensino", escolaNome);
-            adicionarCampo("Ano / Periodo / CH Mensal", `${dados.ano || "-"} / ${dados.periodo || "-"} / ${chMensal}`);
+        function adicionarLinhaCampos(campos) {
+            const altura = 11;
+            const larguraCampo = larguraConteudo / campos.length;
+
+            garantirEspaco(altura);
+            pdf.setDrawColor(...cinzaBorda);
+            pdf.setFillColor(248, 251, 250);
+            pdf.rect(margemX, y, larguraConteudo, altura, "FD");
+
+            campos.forEach(({ rotulo, valor }, index) => {
+                const x = margemX + larguraCampo * index;
+
+                if (index > 0) {
+                    pdf.line(x, y, x, y + altura);
+                }
+
+                pdf.setFont("helvetica", "bold");
+                pdf.setFontSize(8);
+                pdf.setTextColor(...verde);
+                pdf.text(`${rotulo}:`, x + 4, y + 7);
+
+                pdf.setTextColor(...textoEscuro);
+                pdf.text(textoSeguro(valor), x + 24, y + 7);
+            });
+
+            y += altura;
+        }
+
+        function adicionarCabecalho(documentoEscola) {
+            const turmas = documentoEscola.turmas?.length > 0
+                ? documentoEscola.turmas.join(", ")
+                : "-";
+
+            adicionarCampo("Estabelecimento de Ensino", documentoEscola.escola);
+            adicionarLinhaCampos([
+                { rotulo: "Ano", valor: dados.ano || "-" },
+                { rotulo: "Periodo", valor: dados.periodo || "-" },
+                { rotulo: "CH Mensal", valor: chMensal }
+            ]);
+            adicionarCampo(documentoEscola.turmas?.length > 1 ? "Turmas" : "Turma", turmas);
             adicionarCampo("Professor", professorNome);
             adicionarCampo("E-mail", emailProfessor);
             adicionarCampo("Componente Curricular", componenteCurricular);
@@ -337,13 +488,14 @@ export default function VisualizarPlanoProfessor() {
             }
         }
 
-        escolasDocumento.forEach((escolaNome, index) => {
+        escolasDocumento.forEach((documentoEscola, index) => {
             if (index > 0) {
                 novaPagina();
             }
 
+            adicionarLogoDocumento();
             adicionarTituloDocumento();
-            adicionarCabecalho(escolaNome);
+            adicionarCabecalho(documentoEscola);
             adicionarSecao("DESCRITORES", descritoresLista);
             adicionarSecao("CAMPO DE ATUAÇÃO", [dados.campo_atuacao || "-"]);
             adicionarSecao("PRÁTICAS DE LINGUAGEM", [componenteCurricular]);
@@ -373,7 +525,8 @@ export default function VisualizarPlanoProfessor() {
         setSalvandoPdf(true);
 
         try {
-            const pdf = gerarDocumentoPdf();
+            const logoInfo = await carregarImagemDataUrl(logoPlano);
+            const pdf = gerarDocumentoPdf(logoInfo);
             pdf.save(`${gerarNomeArquivoPdf()}.pdf`);
         } catch (error) {
             console.error("Erro ao salvar PDF:", error);
@@ -389,7 +542,8 @@ export default function VisualizarPlanoProfessor() {
         setImprimindoPdf(true);
 
         try {
-            const pdf = gerarDocumentoPdf();
+            const logoInfo = await carregarImagemDataUrl(logoPlano);
+            const pdf = gerarDocumentoPdf(logoInfo);
             pdf.autoPrint();
 
             const pdfUrl = pdf.output("bloburl");
@@ -462,6 +616,11 @@ export default function VisualizarPlanoProfessor() {
                                 <span className="rotulo">CH (Mensal):</span>
                                 <span className="valor">{chMensal}</span>
                             </div>
+                        </div>
+
+                        <div className="linha-cabecalho linha-unica">
+                            <span className="rotulo">{turmasDocumento.length > 1 ? "Turmas:" : "Turma:"}</span>
+                            <span className="valor">{turmasTexto}</span>
                         </div>
 
                         <div className="linha-cabecalho linha-dupla">
