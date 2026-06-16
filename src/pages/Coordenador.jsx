@@ -524,7 +524,7 @@ export default function Coordenador() {
       {etapa === 4 && (
         <>
           <h2>Instrumentos Avaliativos</h2>
-          {["Prova objetiva de múltipla-escolha", "Prova oral", "Prova discursiva", "Vistos em caderno", "Observação"].map((i) => (
+          {opcoesInstrumentos.map((i) => (
             <label key={i}>
               <input type="checkbox" checked={modelo.instrumentos.includes(i)} onChange={() => toggle("instrumentos", i)} />
               {i}
@@ -535,7 +535,7 @@ export default function Coordenador() {
 
           <h3>Recursos usados na mensuração da aprendizagem</h3>
 
-          {["Escrita no quadro", "Impressão em folha", "Livro didático", "Ditada", "Projeção da atividade", "Jogos", "Links"].map((r) => (
+          {recursosAvaliacao.map((r) => (
             <label key={r}>
               <input type="checkbox" checked={modelo.recursosAvaliacao.includes(r)} onChange={() => toggle("recursosAvaliacao", r)} />
               {r}
@@ -554,7 +554,7 @@ export default function Coordenador() {
       {etapa === 5 && (
         <>
           <h2>Metodologias</h2>
-          {["Expositiva ou instrucional", "Seminário", "Debate", "Sala de aula invertida", "Gamificação", "Ensino Hibrido", "Design Thinking", "STEAM", "Cultura Maker"].map((m) => (
+          {metodologias.map((m) => (
             <label key={m}>
               <input type="checkbox" checked={modelo.metodologias.includes(m)} onChange={() => toggle("metodologias", m)} />
               {m}
@@ -566,7 +566,7 @@ export default function Coordenador() {
 
           <h3>Recursos usados na abordagem do conhecimento</h3>
 
-          {["Caixa amplificada", "Escrita no quadro", "Projeção de aula", "Impressão em folha", "Livro didático", "Jogos", "Vídeos", "Materiais concretos", "Áudios", "Cartazes", "Pesquisas na internet"].map((r) => (
+          {recursosMetodologia.map((r) => (
             <label key={r}>
               <input type="checkbox" checked={modelo.recursosMetodologia.includes(r)} onChange={() => toggle("recursosMetodologia", r)} />
               {r}
