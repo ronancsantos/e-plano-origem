@@ -69,7 +69,25 @@ export default function Coordenador() {
     "Prova oral",
     "Prova discursiva",
     "Vistos em caderno",
-    "Observação"
+    "Observação e Participação em Leitura",
+    "Observação e Participação",
+    "Exercícios escritos",
+    "Rubricas",
+    "Atividade Oral",
+    "Seminário",
+    "Relatório",
+    "Avaliação por pares em produção textual",
+    "Atividade interpretativa",
+    "Participação em debates e roda de leitura",
+    "Registros reflexivos (orais e escritos)",
+    "Envolvimento de prática de leitura",
+    "Análise de produção textual",
+    "Revisão de reescrita textual",
+    "Atividade de reconto oral ou declamação",
+    "Registros escritos das análise de efeito de sentido",
+    "Exercício de análise em interpretação",
+    "Atividade de reescrita orientada",
+    "Produção textual: clareza e coerência"
   ];
 
   const recursosAvaliacao = ["Escrita no quadro",
