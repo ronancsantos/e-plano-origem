@@ -16,11 +16,26 @@ async function carregarImagemDataUrl(src) {
             const leitor = new FileReader();
             leitor.onloadend = () => {
                 const imagem = new Image();
-                imagem.onload = () => resolve({
-                    dataUrl: leitor.result,
-                    largura: imagem.naturalWidth,
-                    altura: imagem.naturalHeight
-                });
+                imagem.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    const contexto = canvas.getContext("2d");
+
+                    canvas.width = imagem.naturalWidth;
+                    canvas.height = imagem.naturalHeight;
+
+                    contexto.fillStyle = "#ffffff";
+                    contexto.fillRect(0, 0, canvas.width, canvas.height);
+                    contexto.imageSmoothingEnabled = true;
+                    contexto.imageSmoothingQuality = "high";
+                    contexto.drawImage(imagem, 0, 0);
+
+                    resolve({
+                        dataUrl: canvas.toDataURL("image/jpeg", 0.95),
+                        formato: "JPEG",
+                        largura: imagem.naturalWidth,
+                        altura: imagem.naturalHeight
+                    });
+                };
                 imagem.onerror = reject;
                 imagem.src = leitor.result;
             };
@@ -327,7 +342,7 @@ export default function VisualizarPlanoProfessor() {
             }
 
             garantirEspaco(alturaLogo + 10);
-            pdf.addImage(logoInfo.dataUrl, "PNG", paginaLargura / 2 - larguraLogo / 2, y, larguraLogo, alturaLogo);
+            pdf.addImage(logoInfo.dataUrl, logoInfo.formato || "JPEG", paginaLargura / 2 - larguraLogo / 2, y, larguraLogo, alturaLogo);
             y += alturaLogo + 10;
         }
 
