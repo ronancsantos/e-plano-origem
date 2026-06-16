@@ -161,7 +161,6 @@ export default function EditarPlanoProfessor() {
         "Projeção da atividade",
         "Jogos",
         "Links",
-
     ];
 
     const metodologiasPadrao = [

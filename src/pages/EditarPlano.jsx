@@ -25,11 +25,29 @@ const anos = ["1º", "2º", "3º", "4º", "5º", "6º", "7º", "8º", "9º"];
 const periodos = ["1", "2", "3", "4"];
 
 const opcoesInstrumentos = [
-  "Prova objetiva de multipla-escolha",
+  "Prova objetiva de múltipla-escolha",
   "Prova oral",
   "Prova discursiva",
   "Vistos em caderno",
-  "Observacao"
+  "Observação e Participação em Leitura",
+  "Observação e Participação",
+  "Exercícios escritos",
+  "Rubricas",
+  "Atividade Oral",
+  "Seminário",
+  "Relatório",
+  "Avaliação por pares em produção textual",
+  "Atividade interpretativa",
+  "Participação em debates e roda de leitura",
+  "Registros reflexivos (orais e escritos)",
+  "Envolvimento de prática de leitura",
+  "Análise de produção textual",
+  "Revisão de reescrita textual",
+  "Atividade de reconto oral ou declamação",
+  "Registros escritos das análise de efeito de sentido",
+  "Exercício de análise em interpretação",
+  "Atividade de reescrita orientada",
+  "Produção textual: clareza e coerência"
 ];
 
 const opcoesRecursosAvaliacao = [
@@ -44,28 +62,44 @@ const opcoesRecursosAvaliacao = [
 
 const opcoesMetodologias = [
   "Expositiva ou instrucional",
-  "Seminario",
+  "Seminário",
   "Debate",
   "Sala de aula invertida",
-  "Gamificacao",
+  "Gamificação",
   "Ensino Hibrido",
   "Design Thinking",
   "STEAM",
-  "Cultura Maker"
+  "Cultura Maker",
+  "Caça ao tesouro pedagógica",
+  "Escape Room Educacional",
+  "Aprendizagem Baseada em Problemas (ABP/PBL)",
+  "Aprendizagem Baseada em Desafios (Challenge-Based Learning)",
+  "Aprendizagem Baseada em Mistérios (Mystery-Based Learning)",
+  "Trilha de pistas ou Circuito investigativo",
+  "RPG Educacional",
+  "Detetive Literário",
+  "Storytelling Investigativo",
+  "Sala de Redação Investigativa",
 ];
 
 const opcoesRecursosMetodologia = [
   "Caixa amplificada",
   "Escrita no quadro",
-  "Projecao de aula",
-  "Impressao em folha",
-  "Livro didatico",
+  "Projeção de aula",
+  "Impressão em folha",
+  "Livro didático",
   "Jogos",
-  "Videos",
+  "Vídeos",
   "Materiais concretos",
-  "Audios",
+  "Áudios",
   "Cartazes",
-  "Pesquisas na internet"
+  "Pesquisas na internet",
+  "Revistas",
+  "Computador",
+  "Notebook",
+  "Smartphone",
+  "Tablet",
+  "Smart TV",
 ];
 
 const estadoInicial = {
