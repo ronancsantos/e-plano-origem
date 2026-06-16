@@ -315,12 +315,20 @@ export default function VisualizarPlanoProfessor() {
         function adicionarLogoDocumento() {
             if (!logoInfo?.dataUrl || !logoInfo?.largura || !logoInfo?.altura) return;
 
-            const larguraLogo = 42;
-            const alturaLogo = larguraLogo * (logoInfo.altura / logoInfo.largura);
+            const larguraMaxima = Math.min(95, larguraConteudo * 0.62);
+            const alturaMaxima = 26;
+            const proporcao = logoInfo.altura / logoInfo.largura;
+            let larguraLogo = larguraMaxima;
+            let alturaLogo = larguraLogo * proporcao;
 
-            garantirEspaco(alturaLogo + 8);
+            if (alturaLogo > alturaMaxima) {
+                alturaLogo = alturaMaxima;
+                larguraLogo = alturaLogo / proporcao;
+            }
+
+            garantirEspaco(alturaLogo + 10);
             pdf.addImage(logoInfo.dataUrl, "PNG", paginaLargura / 2 - larguraLogo / 2, y, larguraLogo, alturaLogo);
-            y += alturaLogo + 8;
+            y += alturaLogo + 10;
         }
 
         function adicionarTituloDocumento() {
