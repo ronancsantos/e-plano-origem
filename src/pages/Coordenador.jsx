@@ -81,8 +81,46 @@ export default function Coordenador() {
     "Links"
   ];
 
-  const recursosMetodologia = ["Caixa amplificada", "Escrita no quadro", "Projeção de aula", "Impressão em folha", "Livro didático", "Jogos", "Vídeos", "Materiais concretos", "Áudios", "Cartazes", "Pesquisas na internet"];
-  const metodologias = ["Expositiva ou instrucional", "Seminário", "Debate", "Sala de aula invertida", "Gamificação", "Ensino Hibrido", "Design Thinking", "STEAM", "Cultura Maker"];
+  const recursosMetodologia = [
+    "Caixa amplificada",
+    "Escrita no quadro",
+    "Projeção de aula",
+    "Impressão em folha",
+    "Livro didático",
+    "Jogos",
+    "Vídeos",
+    "Materiais concretos",
+    "Áudios",
+    "Cartazes",
+    "Pesquisas na internet",
+    "Revistas",
+    "Computador",
+    "Notebook",
+    "Smartphone",
+    "Tablet",
+    "Smart TV"
+  ];
+  const metodologias = [
+    "Expositiva ou instrucional",
+    "Seminário",
+    "Debate",
+    "Sala de aula invertida",
+    "Gamificação",
+    "Ensino Hibrido",
+    "Design Thinking",
+    "STEAM",
+    "Cultura Maker",
+    "Caça ao tesouro pedagógica",
+    "Escape Room Educacional",
+    "Aprendizagem Baseada em Problemas (ABP/PBL)",
+    "Aprendizagem Baseada em Desafios (Challenge-Based Learning)",
+    "Aprendizagem Baseada em Mistérios (Mystery-Based Learning)",
+    "Trilha de pistas ou Circuito investigativo",
+    "RPG Educacional",
+    "Detetive Literário",
+    "Storytelling Investigativo",
+    "Sala de Redação Investigativa"
+  ];
 
   useEffect(() => {
     if (modelo.componente && modelo.ano) {
