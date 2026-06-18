@@ -51,6 +51,7 @@ export default function Login() {
         setErro(resposta.error || resposta.erro || "Erro ao fazer login.");
       }
     } catch (error) {
+      console.error("Erro ao conectar com o servidor:", error);
       setErro("Erro ao conectar com o servidor.");
     } finally {
       setLoading(false);
