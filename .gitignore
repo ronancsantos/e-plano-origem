@@ -9,6 +9,13 @@ lerna-debug.log*
 
 node_modules
 dist
+!dist/
+!dist/index.html
+!dist/favicon.svg
+!dist/icons.svg
+!dist/assets/
+!dist/assets/**
+dist/.htaccess
 dist-ssr
 *.local
 
