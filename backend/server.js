@@ -1,5 +1,6 @@
 ﻿const express = require("express");
 const path = require("path");
+const fs = require("fs");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const authRoutes = require("./routes/auth");
@@ -925,16 +926,32 @@ app.post("/professores/:professorId/modelos/:modeloId/plano", async (req, res) =
 
 const frontendDist = path.resolve(__dirname, "../dist");
 const frontendIndex = path.join(frontendDist, "index.html");
+const frontendAssets = path.join(frontendDist, "assets");
+
+app.get("/__static-check", (req, res) => {
+  res.json({
+    cwd: process.cwd(),
+    dirname: __dirname,
+    frontendDist,
+    frontendIndex,
+    frontendAssets,
+    distExiste: fs.existsSync(frontendDist),
+    indexExiste: fs.existsSync(frontendIndex),
+    assetsExiste: fs.existsSync(frontendAssets),
+    assets: fs.existsSync(frontendAssets) ? fs.readdirSync(frontendAssets) : []
+  });
+});
 
 // Servir arquivos estáticos do frontend (dist)
+app.use("/assets", express.static(frontendAssets, { fallthrough: false }));
 app.use(express.static(frontendDist));
-
-app.use("/assets", (req, res) => {
-  res.status(404).type("text/plain").send("Asset não encontrado. Execute o build do frontend antes do deploy.");
-});
 
 // SPA fallback - servir index.html para rotas não encontradas
 app.use((req, res) => {
+  if (!fs.existsSync(frontendIndex)) {
+    return res.status(500).type("text/plain").send(`Frontend não encontrado em ${frontendIndex}`);
+  }
+
   res.sendFile(frontendIndex);
 });
 
