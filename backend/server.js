@@ -6,11 +6,32 @@ const authRoutes = require("./routes/auth");
 const supabase = require("./supabase");
 
 const app = express();
+app.set("trust proxy", 1);
 
 const allowedOrigins = [
   "http://localhost:5173",
   "https://eplano.semedcarutapera.com"
 ];
+
+app.use((req, res, next) => {
+  const host = req.headers.host || "";
+  const protocolo = req.headers["x-forwarded-proto"];
+
+  if (protocolo === "http" && !host.includes("localhost")) {
+    return res.redirect(301, `https://${host}${req.originalUrl}`);
+  }
+
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+
+  if (req.secure || protocolo === "https") {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
+
+  return next();
+});
 
 app.use(cors({
   origin: function (origin, callback) {

@@ -55,13 +55,37 @@ async function carregarImagemDataUrl(src) {
 
     return new Promise((resolve, reject) => {
       const leitor = new FileReader();
-      leitor.onloadend = () => resolve(leitor.result);
+      leitor.onloadend = () => {
+        const imagem = new Image();
+        imagem.onload = () => {
+          const canvas = document.createElement("canvas");
+          const contexto = canvas.getContext("2d");
+
+          canvas.width = imagem.naturalWidth;
+          canvas.height = imagem.naturalHeight;
+
+          contexto.fillStyle = "#ffffff";
+          contexto.fillRect(0, 0, canvas.width, canvas.height);
+          contexto.imageSmoothingEnabled = true;
+          contexto.imageSmoothingQuality = "high";
+          contexto.drawImage(imagem, 0, 0);
+
+          resolve({
+            dataUrl: canvas.toDataURL("image/jpeg", 0.95),
+            formato: "JPEG",
+            largura: imagem.naturalWidth,
+            altura: imagem.naturalHeight
+          });
+        };
+        imagem.onerror = reject;
+        imagem.src = leitor.result;
+      };
       leitor.onerror = reject;
       leitor.readAsDataURL(blob);
     });
   } catch (error) {
     console.error("Erro ao carregar logo do PDF:", error);
-    return "";
+    return null;
   }
 }
 
@@ -139,7 +163,7 @@ export default function VisualizarPlano() {
       .replace(/^_|_$/g, "") || "modelo_plano";
   }
 
-  function gerarDocumentoPdf(logoDataUrl) {
+  function gerarDocumentoPdf(logoInfo) {
     const pdf = new jsPDF("p", "mm", "a4");
     const larguraPagina = pdf.internal.pageSize.getWidth();
     const alturaPagina = pdf.internal.pageSize.getHeight();
@@ -186,8 +210,8 @@ export default function VisualizarPlano() {
       pdf.setFillColor(255, 255, 255);
       pdf.roundedRect(margemX, topoY, larguraConteudo, alturaTotal, 2, 2, "FD");
 
-      if (logoDataUrl) {
-        pdf.addImage(logoDataUrl, "PNG", margemX + 5, topoY + 15, 30, 12);
+      if (logoInfo?.dataUrl) {
+        pdf.addImage(logoInfo.dataUrl, logoInfo.formato || "JPEG", margemX + 5, topoY + 15, 30, 12);
       }
 
       pdf.setFont("helvetica", "bold");
@@ -311,8 +335,8 @@ export default function VisualizarPlano() {
     setSalvandoPdf(true);
 
     try {
-      const logoDataUrl = await carregarImagemDataUrl(logoPlano);
-      gerarDocumentoPdf(logoDataUrl).save(`${gerarNomeArquivoPdf()}.pdf`);
+      const logoInfo = await carregarImagemDataUrl(logoPlano);
+      gerarDocumentoPdf(logoInfo).save(`${gerarNomeArquivoPdf()}.pdf`);
     } catch (error) {
       console.error("Erro ao salvar PDF:", error);
       window.print();
@@ -327,8 +351,8 @@ export default function VisualizarPlano() {
     setImprimindoPdf(true);
 
     try {
-      const logoDataUrl = await carregarImagemDataUrl(logoPlano);
-      const pdf = gerarDocumentoPdf(logoDataUrl);
+      const logoInfo = await carregarImagemDataUrl(logoPlano);
+      const pdf = gerarDocumentoPdf(logoInfo);
       pdf.autoPrint();
 
       const pdfUrl = pdf.output("bloburl");

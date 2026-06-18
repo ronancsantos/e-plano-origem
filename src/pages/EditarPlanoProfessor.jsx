@@ -37,6 +37,8 @@ export default function EditarPlanoProfessor() {
     const [busca, setBusca] = useState("");
     const [erro, setErro] = useState("");
     const [novoDescritor, setNovoDescritor] = useState("");
+    const [descritorAberto, setDescritorAberto] = useState(false);
+    const [filtroDescritor, setFiltroDescritor] = useState("");
     const [novoGenero, setNovoGenero] = useState("");
 
     const chaveEtapa = usuario?.id ? `plano_professor_etapa_${usuario.id}_${id}` : "";
@@ -106,7 +108,37 @@ export default function EditarPlanoProfessor() {
         "D18 - Reconhecer o efeito de sentido decorrente da escolha de uma determinada palavra ou expressão.",
         "D19 - Reconhecer o efeito de sentido decorrente da exploração de recursos ortográficos e/ou morfossintáticos.",
         "D20 - Reconhecer diferentes formas de tratar uma informação na comparação de textos que tratam do mesmo tema, em função das condições em que ele foi produzido e daquelas em que será recebido.",
-        "D21 - Reconhecer posições distintas entre duas ou mais opiniões relativas ao mesmo fato ou ao mesmo tema."
+        "D21 - Reconhecer posições distintas entre duas ou mais opiniões relativas ao mesmo fato ou ao mesmo tema.",
+        "Analisar os mecanismos que contribuem para a progressão textual.",
+        "Analisar os processos de referenciação lexical e pronominal.",
+        "Analisar efeitos de sentido produzidos pelo uso de formas de apropriação textual (paráfrase, citação etc.).",
+        "Distinguir fatos de opiniões em textos.",
+        "Analisar os efeitos de sentido produzidos pelo uso de modalizadores em textos diversos.",
+        "Analisar os efeitos de sentido dos tempos, modos e/ou vozes verbais com base no gênero textual e na intenção comunicativa.",
+        "Analisar o uso de figuras de linguagem como estratégia argumentativa.",
+        "Analisar elementos constitutivos de textos pertencentes ao domínio literário.",
+        "Analisar as variedades linguísticas em textos.",
+        "Interpretar a presença de valores sociais, culturais e humanos em textos literários.",
+        "Analisar a intertextualidade entre textos literários ou entre estes e outros textos verbais ou não verbais.",
+        "Analisar os efeitos de sentido decorrentes do uso da pontuação.",
+        "Analisar elementos constitutivos de gêneros textuais diversos.",
+        "Analisar os efeitos de sentido decorrentes do uso dos adjetivos.",
+        "Analisar marcas de parcialidade em textos jornalísticos.",
+        "Analisar os efeitos de sentido decorrentes dos mecanismos de construção de textos jornalísticos/midiáticos.",
+        "Identificar o uso de recursos persuasivos em textos verbais e não verbais.",
+        "Identificar formas de organização de textos normativos, legais e/ou reivindicatórios.",
+        "Identificar os recursos de modalização em textos diversos.",
+        "Reconhecer os usos da pontuação.",
+        "Identificar elementos constitutivos de gêneros de divulgação científica.",
+        "Identificar teses/opiniões/posicionamentos explícitos e argumentos em textos.",
+        "Reconhecer diferentes gêneros textuais.",
+        "Identificar elementos constitutivos de textos pertencentes ao domínio jornalístico/midiático.",
+        "Inferir informações implícitas em distintos textos.",
+        "Inferir a presença de valores sociais, culturais e humanos em textos literários.",
+        "Avaliar a adequação das variedades linguísticas em contextos de uso.",
+        "Avaliar a fidedignidade de informações sobre um mesmo fato divulgado em diferentes veículos e mídias.",
+        "Avaliar a eficácia das estratégias argumentativas em textos de diferentes gêneros.",
+        "Produzir texto em língua portuguesa, de acordo com o gênero textual e o tema demandados."
     ];
 
     const opcoesGeneros = [
@@ -221,6 +253,50 @@ export default function EditarPlanoProfessor() {
     const opcoesRecursosMetodologia = (modeloBase?.metodologias_recursos && modeloBase.metodologias_recursos.length > 0)
         ? modeloBase.metodologias_recursos
         : recursosMetodologiaPadrao;
+
+    function normalizarBusca(valor) {
+        return String(valor || "")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    const descritoresFiltrados = opcoesDescritores.filter((descritor) =>
+        normalizarBusca(descritor).includes(normalizarBusca(filtroDescritor))
+    );
+
+    function selecionarDescritor(descritor) {
+        setNovoDescritor(descritor);
+        setFiltroDescritor("");
+        setDescritorAberto(false);
+    }
+
+    function teclaDescritor(e) {
+        if (e.key === "Enter" && descritorAberto && descritoresFiltrados.length > 0) {
+            e.preventDefault();
+            selecionarDescritor(descritoresFiltrados[0]);
+            return;
+        }
+
+        if (e.key === "Escape") {
+            setDescritorAberto(false);
+            setFiltroDescritor("");
+            return;
+        }
+
+        if (e.key === "Backspace") {
+            e.preventDefault();
+            setDescritorAberto(true);
+            setFiltroDescritor((atual) => atual.slice(0, -1));
+            return;
+        }
+
+        if (e.key.length === 1) {
+            e.preventDefault();
+            setDescritorAberto(true);
+            setFiltroDescritor((atual) => atual + e.key);
+        }
+    }
 
 
     useEffect(() => {
@@ -381,27 +457,34 @@ export default function EditarPlanoProfessor() {
     }
 
     function adicionarDescritor() {
-        if (!novoDescritor) {
+        const descritorSelecionado = opcoesDescritores.find(
+            (descritor) => normalizarBusca(descritor) === normalizarBusca(novoDescritor)
+        );
+
+        if (!descritorSelecionado) {
             setErro("Selecione um descritor.");
+            setDescritorAberto(true);
             return;
         }
 
         setPlanoProfessor((prev) => {
             const descritoresAtuais = Array.isArray(prev.descritores) ? prev.descritores : [];
 
-            if (descritoresAtuais.includes(novoDescritor)) {
+            if (descritoresAtuais.includes(descritorSelecionado)) {
                 setErro("Esse descritor já foi adicionado.");
                 return prev;
             }
 
             return {
                 ...prev,
-                descritores: [...descritoresAtuais, novoDescritor]
+                descritores: [...descritoresAtuais, descritorSelecionado]
             };
         });
 
         setErro("");
         setNovoDescritor("");
+        setFiltroDescritor("");
+        setDescritorAberto(false);
     }
 
     function removerDescritor(descritor) {
@@ -480,6 +563,18 @@ export default function EditarPlanoProfessor() {
 
         setErro("");
         setEtapa(2);
+    }
+
+    function validarEtapa4() {
+        const criterios = String(planoProfessor.tiposAvaliacaoTexto || "").trim();
+
+        if (!criterios) {
+            setErro("Preencha os Critérios Avaliativos antes de avançar.");
+            return;
+        }
+
+        setErro("");
+        setEtapa(5);
     }
 
     async function handleSubmit(e) {
@@ -638,17 +733,43 @@ export default function EditarPlanoProfessor() {
                                     <div className="turma-builder-grid escola-builder-grid">
                                         <div className="form-group">
                                             <label>Descritor</label>
-                                            <select
-                                                value={novoDescritor}
-                                                onChange={(e) => setNovoDescritor(e.target.value)}
-                                            >
-                                                <option value="">Selecione o descritor</option>
-                                                {opcoesDescritores.map((descritor) => (
-                                                    <option key={descritor} value={descritor}>
-                                                        {descritor}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                            <div className="descritor-combobox">
+                                                <button
+                                                    type="button"
+                                                    className={`descritor-select ${novoDescritor ? "tem-valor" : ""}`}
+                                                    onClick={() => setDescritorAberto((aberto) => !aberto)}
+                                                    onKeyDown={teclaDescritor}
+                                                    aria-expanded={descritorAberto}
+                                                    aria-controls="descritores-opcoes"
+                                                >
+                                                    <span>{novoDescritor || "Selecione o descritor"}</span>
+                                                </button>
+
+                                                {descritorAberto && (
+                                                    <div id="descritores-opcoes" className="descritor-opcoes" role="listbox">
+                                                        {filtroDescritor && (
+                                                            <div className="descritor-filtro">Filtro: {filtroDescritor}</div>
+                                                        )}
+
+                                                        {descritoresFiltrados.length > 0 ? (
+                                                            descritoresFiltrados.map((descritor) => (
+                                                                <button
+                                                                    key={descritor}
+                                                                    type="button"
+                                                                    className="descritor-opcao"
+                                                                    onMouseDown={(e) => e.preventDefault()}
+                                                                    onClick={() => selecionarDescritor(descritor)}
+                                                                    role="option"
+                                                                >
+                                                                    {descritor}
+                                                                </button>
+                                                            ))
+                                                        ) : (
+                                                            <div className="descritor-sem-opcoes">Nenhum descritor encontrado.</div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
 
                                         <div className="turma-btn-area">
@@ -938,6 +1059,13 @@ export default function EditarPlanoProfessor() {
                             <>
                                 <h2>Critérios Avaliativos</h2>
 
+                                <p>
+                                    <strong>Habilidades selecionadas:</strong>{" "}
+                                    {planoProfessor.habilidades?.length > 0
+                                        ? planoProfessor.habilidades.join(", ")
+                                        : "Nenhuma habilidade selecionada."}
+                                </p>
+
                                 {Array.isArray(modeloBase.tipos_avaliacao) && modeloBase.tipos_avaliacao.length > 0 && (
                                     <div className="resumo-edicao" style={{ marginBottom: "16px" }}>
                                         <p>
@@ -976,7 +1104,7 @@ export default function EditarPlanoProfessor() {
                                     <button
                                         type="button"
                                         className="btn btn-primary btn-etapa"
-                                        onClick={() => setEtapa(5)}
+                                        onClick={validarEtapa4}
                                     >
                                         Próximo
                                         <CircleArrowRight color="#ffffff" size={22} />

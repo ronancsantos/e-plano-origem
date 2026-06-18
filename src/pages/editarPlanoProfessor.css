@@ -358,6 +358,112 @@
   white-space: nowrap;
 }
 
+.editar-plano-page .descritor-combobox {
+  position: relative;
+}
+
+.editar-plano-page .descritor-select {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #94a3b8;
+  font: inherit;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+}
+
+.editar-plano-page .descritor-select::after {
+  content: "";
+  width: 0;
+  height: 0;
+  flex: 0 0 auto;
+  border-right: 5px solid transparent;
+  border-left: 5px solid transparent;
+  border-top: 6px solid #64748b;
+}
+
+.editar-plano-page .descritor-select span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editar-plano-page .descritor-select.tem-valor {
+  color: #0f172a;
+}
+
+.editar-plano-page .descritor-select:focus {
+  border-color: #0f766e;
+  background: #fbfefe;
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.14);
+  outline: none;
+}
+
+.editar-plano-page .descritor-opcoes {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
+}
+
+.editar-plano-page .descritor-filtro {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 8px 14px;
+  border-bottom: 1px solid #ccfbf1;
+  background: #f0fdfa;
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.editar-plano-page .descritor-opcao {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 0;
+  border-bottom: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  font: inherit;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+
+.editar-plano-page .descritor-opcao:hover,
+.editar-plano-page .descritor-opcao:focus {
+  background: #f0fdfa;
+  color: #0f766e;
+  outline: none;
+}
+
+.editar-plano-page .descritor-opcao:last-child {
+  border-bottom: 0;
+}
+
+.editar-plano-page .descritor-sem-opcoes {
+  padding: 12px 14px;
+  color: #64748b;
+}
+
 .editar-plano-page .turmas-selecionadas {
   display: flex;
   flex-wrap: wrap;
