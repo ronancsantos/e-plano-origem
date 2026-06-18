@@ -943,8 +943,31 @@ app.get("/__static-check", (req, res) => {
 });
 
 // Servir arquivos estáticos do frontend (dist)
-app.use("/assets", express.static(frontendAssets, { fallthrough: false }));
-app.use(express.static(frontendDist));
+app.use(
+  "/assets",
+  express.static(frontendAssets, {
+    fallthrough: false,
+    etag: false,
+    maxAge: 0,
+    setHeaders: (res) => {
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
+    }
+  })
+);
+
+app.use(express.static(frontendDist, {
+  etag: false,
+  maxAge: 0,
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith("index.html")) {
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
+    }
+  }
+}));
 
 // SPA fallback - servir index.html para rotas não encontradas
 app.use((req, res) => {
@@ -952,6 +975,9 @@ app.use((req, res) => {
     return res.status(500).type("text/plain").send(`Frontend não encontrado em ${frontendIndex}`);
   }
 
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
   res.sendFile(frontendIndex);
 });
 
