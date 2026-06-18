@@ -10,6 +10,7 @@ app.set("trust proxy", 1);
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://127.0.0.1:5173",
   "https://eplano.semedcarutapera.com"
 ];
 
@@ -922,12 +923,19 @@ app.post("/professores/:professorId/modelos/:modeloId/plano", async (req, res) =
   }
 });
 
+const frontendDist = path.resolve(__dirname, "../dist");
+const frontendIndex = path.join(frontendDist, "index.html");
+
 // Servir arquivos estáticos do frontend (dist)
-app.use(express.static(path.join(__dirname, '../dist')));
+app.use(express.static(frontendDist));
+
+app.use("/assets", (req, res) => {
+  res.status(404).type("text/plain").send("Asset não encontrado. Execute o build do frontend antes do deploy.");
+});
 
 // SPA fallback - servir index.html para rotas não encontradas
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
+  res.sendFile(frontendIndex);
 });
 
 const PORT = process.env.PORT || 3000;
