@@ -4,8 +4,18 @@ const bcrypt = require("bcryptjs");
 const supabase = require("../supabase");
 
 const router = express.Router();
+const semSenha = (registro) => {
+  const seguro = { ...registro };
+  delete seguro.senha;
+  return seguro;
+};
 
-const SECRET = process.env.JWT_SECRET || "seu_segredo_super_seguro";
+const SECRET = process.env.JWT_SECRET;
+const JWT_OPTIONS = { issuer: "e-plano", audience: "e-plano-web" };
+
+if (!SECRET || SECRET.length < 32) {
+  throw new Error("JWT_SECRET deve estar configurado com pelo menos 32 caracteres.");
+}
 
 // ============================
 // MIDDLEWARE DE TOKEN
@@ -20,7 +30,7 @@ function autenticarToken(req, res, next) {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, SECRET);
+    const decoded = jwt.verify(token, SECRET, JWT_OPTIONS);
     req.usuario = decoded;
     next();
   } catch {
@@ -58,7 +68,7 @@ router.post("/login", async (req, res) => {
           // support existing plaintext passwords: if match, rehash and update
           passwordMatches = usuario.senha === senha;
           if (passwordMatches) {
-            const hashed = await bcrypt.hash(senha, 10);
+            const hashed = await bcrypt.hash(senha, 12);
             await supabase.from('usuarios').update({ senha: hashed }).eq('id', usuario.id);
             usuario.senha = hashed;
           }
@@ -68,7 +78,7 @@ router.post("/login", async (req, res) => {
       }
 
       if (!passwordMatches) {
-        return res.status(401).json({ erro: "Senha inválida." });
+        return res.status(401).json({ erro: "E-mail ou senha inválidos." });
       }
 
       const token = jwt.sign(
@@ -80,10 +90,10 @@ router.post("/login", async (req, res) => {
           tipo: usuario.perfil
         },
         SECRET,
-        { expiresIn: "1d" }
+        { ...JWT_OPTIONS, expiresIn: "8h" }
       );
 
-      return res.json({ token, usuario });
+      return res.json({ token, usuario: semSenha(usuario) });
     }
 
     // PROFESSORES
@@ -96,7 +106,7 @@ router.post("/login", async (req, res) => {
     if (errProfessor) return res.status(500).json({ erro: errProfessor.message });
 
     if (!professor) {
-      return res.status(404).json({ erro: "Usuário não encontrado." });
+      return res.status(401).json({ erro: "E-mail ou senha inválidos." });
     }
 
     try {
@@ -106,12 +116,12 @@ router.post("/login", async (req, res) => {
       } else {
         passwordMatches = professor.senha === senha;
         if (passwordMatches) {
-          const hashed = await bcrypt.hash(senha, 10);
+          const hashed = await bcrypt.hash(senha, 12);
           await supabase.from('professores').update({ senha: hashed }).eq('id', professor.id);
           professor.senha = hashed;
         }
       }
-      if (!passwordMatches) return res.status(401).json({ erro: "Senha inválida." });
+      if (!passwordMatches) return res.status(401).json({ erro: "E-mail ou senha inválidos." });
     } catch (e) {
       return res.status(500).json({ erro: 'Erro ao validar senha.' });
     }
@@ -125,13 +135,13 @@ router.post("/login", async (req, res) => {
         tipo: "professor"
       },
       SECRET,
-      { expiresIn: "1d" }
+      { ...JWT_OPTIONS, expiresIn: "8h" }
     );
 
     return res.json({
       token,
       usuario: {
-        ...professor,
+        ...semSenha(professor),
         perfil: "professor",
         tipo: "professor"
       }
@@ -192,6 +202,10 @@ router.post("/register", autenticarToken, async (req, res) => {
     });
   }
 
+  if (String(senha).length < 8) {
+    return res.status(400).json({ erro: "A senha deve ter pelo menos 8 caracteres." });
+  }
+
   if (
     tipoFinal !== "admin" &&
     tipoFinal !== "coordenador"
@@ -225,7 +239,7 @@ router.post("/register", autenticarToken, async (req, res) => {
       {
         nome,
         email,
-        senha: await bcrypt.hash(senha, 10),
+        senha: await bcrypt.hash(senha, 12),
         perfil: tipoFinal
       }
     ])
@@ -254,6 +268,10 @@ router.post("/register", autenticarToken, async (req, res) => {
 // LISTAR USUÁRIOS
 // ============================
 router.get("/usuarios", autenticarToken, async (req, res) => {
+  if (!["admin", "coordenador"].includes(req.usuario.perfil)) {
+    return res.status(403).json({ erro: "Acesso não autorizado." });
+  }
+
   const { data, error } = await supabase
     .from("usuarios")
     .select("id,nome,email,perfil")
@@ -311,3 +329,4 @@ router.delete("/usuarios/:id", autenticarToken, async (req, res) => {
 });
 
 module.exports = router;
+module.exports.autenticarToken = autenticarToken;

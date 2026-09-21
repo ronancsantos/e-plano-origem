@@ -3,22 +3,33 @@
 // o desenvolvimento ou para outro ambiente, quando necessario.
 const API = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 
+const apiFetch = (url, options = {}) => {
+  const token = localStorage.getItem("token");
+  const headers = new Headers(options.headers || {});
+
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  return globalThis.fetch(url, { ...options, headers });
+};
+
 // 🔹 LISTAR PLANOS
 export const listarPlanos = async () => {
-  const res = await fetch(`${API}/planos`);
+  const res = await apiFetch(`${API}/planos`);
   return res.json();
 };
 
 // 🔹 DELETAR PLANO
 export const deletarPlano = async (id) => {
-  await fetch(`${API}/planos/${id}`, {
+  await apiFetch(`${API}/planos/${id}`, {
     method: "DELETE",
   });
 };
 
 // 🔹 SALVAR PLANO
 export async function salvarPlano(plano) {
-  const res = await fetch(`${API}/planos`, {
+  const res = await apiFetch(`${API}/planos`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -32,7 +43,7 @@ export async function salvarPlano(plano) {
 
 // 🔹 BNCC (QUERY)
 export async function listarBNCC(componente, ano) {
-  const res = await fetch(
+  const res = await apiFetch(
     `${API}/bncc/${componente}/${ano}`
   );
   return res.json();
@@ -40,7 +51,7 @@ export async function listarBNCC(componente, ano) {
 
 // 🔹 BNCC (REST)
 export async function buscarBNCC(componente, ano) {
-  const res = await fetch(
+  const res = await apiFetch(
     `${API}/bncc/${componente}/${ano}`
   );
   return res.json();
@@ -48,12 +59,12 @@ export async function buscarBNCC(componente, ano) {
 
 // 🔹 LISTAR MODELOS
 export async function listarModelos() {
-  const res = await fetch(`${API}/modelos`);
+  const res = await apiFetch(`${API}/modelos`);
   return res.json();
 }
 
 export const buscarPlano = async (id) => {
-  const res = await fetch(`${API}/planos/${id}`);
+  const res = await apiFetch(`${API}/planos/${id}`);
 
   if (!res.ok) {
     throw new Error("Plano não encontrado");
@@ -63,7 +74,7 @@ export const buscarPlano = async (id) => {
 };
 
 export const atualizarPlano = async (id, dados) => {
-  const res = await fetch(`${API}/planos/${id}`, {
+  const res = await apiFetch(`${API}/planos/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(dados),
@@ -75,17 +86,17 @@ export const atualizarPlano = async (id, dados) => {
 // ===============================
 
 export async function listarProfessores() {
-  const res = await fetch(`${API}/professores`);
+  const res = await apiFetch(`${API}/professores`);
   return res.json();
 }
 
 export async function buscarProfessor(id) {
-  const res = await fetch(`${API}/professores/${id}`);
+  const res = await apiFetch(`${API}/professores/${id}`);
   return res.json();
 }
 
 export async function salvarProfessor(professor) {
-  const res = await fetch(`${API}/professores`, {
+  const res = await apiFetch(`${API}/professores`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -96,7 +107,7 @@ export async function salvarProfessor(professor) {
 }
 
 export async function atualizarProfessor(id, professor) {
-  const res = await fetch(`${API}/professores/${id}`, {
+  const res = await apiFetch(`${API}/professores/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -107,14 +118,14 @@ export async function atualizarProfessor(id, professor) {
 }
 
 export async function deletarProfessor(id) {
-  const res = await fetch(`${API}/professores/${id}`, {
+  const res = await apiFetch(`${API}/professores/${id}`, {
     method: "DELETE",
   });
   return res.json();
 }
 
 export async function atualizarFotoProfessor(id, dados) {
-  const res = await fetch(`${API}/professores/${id}/foto`, {
+  const res = await apiFetch(`${API}/professores/${id}/foto`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -130,23 +141,23 @@ export async function atualizarFotoProfessor(id, dados) {
 // ===============================
 
 export async function listarEscolas() {
-  const res = await fetch(`${API}/escolas`);
+  const res = await apiFetch(`${API}/escolas`);
   return res.json();
 }
 
 export async function listarComponentes() {
-  const res = await fetch(`${API}/componentes`);
+  const res = await apiFetch(`${API}/componentes`);
   return res.json();
 }
 
 export async function listarTurmas() {
-  const res = await fetch(`${API}/turmas`);
+  const res = await apiFetch(`${API}/turmas`);
   return res.json();
 }
 
 // LOGIN
 export async function loginUsuario(dados) {
-  const res = await fetch(`${API}/auth/login`, {
+  const res = await apiFetch(`${API}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -159,7 +170,7 @@ export async function loginUsuario(dados) {
 
 // USUÁRIO LOGADO
 export async function buscarUsuarioLogado(token) {
-  const res = await fetch(`${API}/auth/me`, {
+  const res = await apiFetch(`${API}/auth/me`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -172,7 +183,7 @@ export async function buscarUsuarioLogado(token) {
 export async function cadastrarUsuario(dados) {
   const token = localStorage.getItem("token");
 
-  const res = await fetch(`${API}/auth/register`, {
+  const res = await apiFetch(`${API}/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -188,7 +199,7 @@ export async function cadastrarUsuario(dados) {
 export async function listarUsuarios() {
   const token = localStorage.getItem("token");
 
-  const res = await fetch(`${API}/auth/usuarios`, {
+  const res = await apiFetch(`${API}/auth/usuarios`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -201,7 +212,7 @@ export async function listarUsuarios() {
 export async function deletarUsuario(id) {
   const token = localStorage.getItem("token");
 
-  const res = await fetch(`${API}/auth/usuarios/${id}`, {
+  const res = await apiFetch(`${API}/auth/usuarios/${id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -212,7 +223,7 @@ export async function deletarUsuario(id) {
 }
 
 export async function enviarModeloPlano(id) {
-  const res = await fetch(`${API}/planos/${id}/enviar`, {
+  const res = await apiFetch(`${API}/planos/${id}/enviar`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -229,7 +240,7 @@ export async function enviarModeloPlano(id) {
 }
 
 export async function listarModelosProfessor(professorId) {
-  const res = await fetch(`${API}/professores/${professorId}/modelos`);
+  const res = await apiFetch(`${API}/professores/${professorId}/modelos`);
 
   const data = await res.json();
 
@@ -241,12 +252,12 @@ export async function listarModelosProfessor(professorId) {
 }
 
 export async function buscarPlanoProfessor(professorId, modeloId) {
-  const res = await fetch(`${API}/professores/${professorId}/modelos/${modeloId}/plano`);
+  const res = await apiFetch(`${API}/professores/${professorId}/modelos/${modeloId}/plano`);
   return res.json();
 }
 
 export async function salvarPlanoProfessor(professorId, modeloId, dados) {
-  const res = await fetch(`${API}/professores/${professorId}/modelos/${modeloId}/plano`, {
+  const res = await apiFetch(`${API}/professores/${professorId}/modelos/${modeloId}/plano`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -259,7 +270,7 @@ export async function salvarPlanoProfessor(professorId, modeloId, dados) {
 
 
 export const listarPlanosProfessor = async () => {
-  const res = await fetch(`${API}/planos-professor`);
+  const res = await apiFetch(`${API}/planos-professor`);
 
   if (!res.ok) {
     throw new Error("Erro ao listar planos do professor");
@@ -269,7 +280,7 @@ export const listarPlanosProfessor = async () => {
 };
 
 export const listarResumoDashboardCoordenador = async () => {
-  const res = await fetch(`${API}/dashboard/coordenador`);
+  const res = await apiFetch(`${API}/dashboard/coordenador`);
 
   if (!res.ok) {
     throw new Error("Erro ao listar resumo do dashboard");

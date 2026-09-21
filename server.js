@@ -1,4 +1,5 @@
 import express from "express";
+import helmet from "helmet";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
@@ -8,6 +9,23 @@ const api = require("./backend/server.js");
 const app = express();
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.join(rootDir, "dist");
+
+app.disable("x-powered-by");
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https://*.supabase.co"],
+      connectSrc: ["'self'", "https://*.supabase.co"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      frameAncestors: ["'none'"]
+    }
+  },
+  crossOriginResourcePolicy: { policy: "same-site" }
+}));
 
 // A API fica no mesmo deploy e dominio do frontend.
 app.use("/api", api);

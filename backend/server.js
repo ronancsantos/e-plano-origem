@@ -1,11 +1,15 @@
 ﻿const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
+const helmet = require("helmet");
+const { rateLimit } = require("express-rate-limit");
 const authRoutes = require("./routes/auth");
+const { autenticarToken } = authRoutes;
 const supabase = require("./supabase");
 
 const app = express();
 app.set("trust proxy", 1);
+app.disable("x-powered-by");
 
 const allowedOrigins = [
   "http://localhost:5173",
@@ -20,7 +24,7 @@ const isAllowedOrigin = (origin) => {
   try {
     const url = new URL(origin);
     const isLocal = url.protocol === "http:" && ["localhost", "127.0.0.1"].includes(url.hostname);
-    return isLocal || url.hostname.endsWith(".vercel.app");
+    return isLocal;
   } catch {
     return false;
   }
@@ -46,6 +50,22 @@ app.use((req, res, next) => {
   return next();
 });
 
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https://*.supabase.co"],
+      connectSrc: ["'self'", "https://*.supabase.co"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      frameAncestors: ["'none'"]
+    }
+  },
+  crossOriginResourcePolicy: { policy: "same-site" }
+}));
+
 app.use(cors({
   origin: function (origin, callback) {
     // permite requests sem origin (mobile, postman)
@@ -60,11 +80,52 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json({ limit: "8mb" }));
+app.use(express.json({ limit: "7mb", strict: true }));
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 600,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Muitas requisições. Tente novamente em alguns minutos." }
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: { erro: "Muitas tentativas de login. Aguarde 15 minutos." }
+});
+
+app.use(apiLimiter);
+app.use("/auth/login", loginLimiter);
 app.use("/auth", authRoutes);
 
 app.get("/health", (_req, res) => {
   res.json({ ok: true });
+});
+
+app.use(autenticarToken);
+app.use((req, res, next) => {
+  const perfil = req.usuario.perfil || req.usuario.tipo;
+  if (["admin", "coordenador"].includes(perfil)) return next();
+
+  if (perfil === "professor") {
+    const id = String(req.usuario.id);
+    const pathProfessor = `/professores/${id}`;
+    const permitido =
+      (req.method === "GET" && req.path.startsWith("/bncc/")) ||
+      (req.method === "GET" && /^\/planos\/\d+$/.test(req.path)) ||
+      (req.method === "GET" && req.path === pathProfessor) ||
+      (req.method === "PUT" && req.path === `${pathProfessor}/foto`) ||
+      (["GET", "POST"].includes(req.method) && req.path.startsWith(`${pathProfessor}/modelos`));
+
+    if (permitido) return next();
+  }
+
+  return res.status(403).json({ error: "Acesso não autorizado." });
 });
 
 const parsePeriodo = (p) => {
@@ -87,7 +148,7 @@ const parseJSON = (value) => {
 
 const supabaseError = (res, error, defaultMessage) => {
   console.error(error);
-  return res.status(500).json({ error: defaultMessage || (error && error.message) || "Erro no banco de dados." });
+  return res.status(500).json({ error: defaultMessage || "Erro interno no servidor." });
 };
 
 const limparAtuacoesProfessor = async (professorId) => {
@@ -422,7 +483,7 @@ app.get("/turmas", async (req, res) => {
 app.get("/professores", async (req, res) => {
   try {
     const [{ data: professores, error: errProf }, { data: atuacoes, error: errAtuacoes }, { data: escolas, error: errEscolas }, { data: componentes, error: errComponentes }, { data: turmas, error: errTurmas }] = await Promise.all([
-      supabase.from("professores").select("*").order("nome", { ascending: true }),
+      supabase.from("professores").select("id,nome,turno,email,foto_perfil_url,foto_perfil_path,foto_perfil_atualizada_em").order("nome", { ascending: true }),
       supabase.from("professor_atuacoes").select("*"),
       supabase.from("escolas").select("id,nome"),
       supabase.from("componentes").select("id,nome"),
@@ -445,7 +506,6 @@ app.get("/professores", async (req, res) => {
         nome: professor.nome,
         turno: professor.turno,
         email: professor.email,
-        senha: professor.senha,
         atribuicoes: []
       });
     });
@@ -475,7 +535,7 @@ app.get("/professores/:id", async (req, res) => {
   try {
     const professorId = req.params.id;
     const [{ data: professor, error: errProf }, { data: atuacoes, error: errAtuacoes }, { data: escolas, error: errEscolas }, { data: componentes, error: errComponentes }, { data: turmas, error: errTurmas }] = await Promise.all([
-      supabase.from("professores").select("*").eq("id", professorId).maybeSingle(),
+      supabase.from("professores").select("id,nome,turno,email,foto_perfil_url,foto_perfil_path,foto_perfil_atualizada_em").eq("id", professorId).maybeSingle(),
       supabase.from("professor_atuacoes").select("*").eq("professor_id", professorId),
       supabase.from("escolas").select("id,nome"),
       supabase.from("componentes").select("id,nome"),
@@ -498,7 +558,6 @@ app.get("/professores/:id", async (req, res) => {
       nome: professor.nome,
       turno: professor.turno,
       email: professor.email,
-      senha: professor.senha,
       atribuicoes: (atuacoes || []).map((atuacao) => ({
         id: atuacao.id,
         escola_id: atuacao.escola_id,
@@ -521,6 +580,9 @@ app.post("/professores", async (req, res) => {
     if (!nome || !turno || !email || !senha) {
       return res.status(400).json({ error: "Preencha nome, turno, e-mail e senha." });
     }
+    if (String(senha).length < 8) {
+      return res.status(400).json({ error: "A senha deve ter pelo menos 8 caracteres." });
+    }
     if (!Array.isArray(atribuicoes) || atribuicoes.length === 0) {
       return res.status(400).json({ error: "Adicione pelo menos uma atribuição." });
     }
@@ -533,7 +595,7 @@ app.post("/professores", async (req, res) => {
     if (errExistente) return supabaseError(res, errExistente);
     if (existente) return res.status(400).json({ error: "Já existe um professor com este e-mail." });
 
-    const senhaHash = await bcrypt.hash(senha, 10);
+    const senhaHash = await bcrypt.hash(senha, 12);
     const { data, error } = await supabase
       .from("professores")
       .insert([{ nome, turno, email, senha: senhaHash }])
@@ -552,18 +614,23 @@ app.put("/professores/:id", async (req, res) => {
   try {
     const professorId = req.params.id;
     const { nome, turno, email, senha, atribuicoes } = req.body;
-    if (!nome || !turno || !email || !senha) {
-      return res.status(400).json({ error: "Preencha nome, turno, e-mail e senha." });
+    if (!nome || !turno || !email) {
+      return res.status(400).json({ error: "Preencha nome, turno e e-mail." });
     }
     if (!Array.isArray(atribuicoes) || atribuicoes.length === 0) {
       return res.status(400).json({ error: "Adicione pelo menos uma atribuição." });
     }
 
-    const senhaHash = senha.startsWith("$2") ? senha : await bcrypt.hash(senha, 10);
+    if (senha && String(senha).length < 8) {
+      return res.status(400).json({ error: "A senha deve ter pelo menos 8 caracteres." });
+    }
+
+    const atualizacao = { nome, turno, email };
+    if (senha) atualizacao.senha = await bcrypt.hash(String(senha), 12);
 
     const { error } = await supabase
       .from("professores")
-      .update({ nome, turno, email, senha: senhaHash })
+      .update(atualizacao)
       .eq("id", professorId);
     if (error) {
       if (error.message && error.message.includes("duplicate key value")) {

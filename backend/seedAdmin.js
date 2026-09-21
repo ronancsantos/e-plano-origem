@@ -7,8 +7,13 @@ const bcrypt = require('bcryptjs');
     process.exit(1);
   }
 
-  const email = 'admin@eplano.com';
-  const senha = '123456';
+  const email = process.env.ADMIN_INITIAL_EMAIL;
+  const senha = process.env.ADMIN_INITIAL_PASSWORD;
+
+  if (!email || !senha || senha.length < 12) {
+    console.error('Defina ADMIN_INITIAL_EMAIL e ADMIN_INITIAL_PASSWORD (mínimo de 12 caracteres).');
+    process.exit(1);
+  }
 
   try {
     const { data: existente, error: errCheck } = await supabase

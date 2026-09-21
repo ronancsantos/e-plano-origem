@@ -125,7 +125,7 @@ export default function Professores() {
       nome: professor.nome || "",
       turno: professor.turno || "",
       email: professor.email || "",
-      senha: professor.senha || "",
+      senha: "",
       atribuicoes: (professor.atribuicoes || []).map((item) => ({
         escolaId: item.escola_id,
         componenteId: item.componente_id,
@@ -232,8 +232,8 @@ export default function Professores() {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    if (!modelo.nome || !modelo.turno || !modelo.email || !modelo.senha) {
-      showToast("Preencha nome, turno, e-mail e senha.", "erro");
+    if (!modelo.nome || !modelo.turno || !modelo.email || (!editandoId && !modelo.senha)) {
+      showToast(editandoId ? "Preencha nome, turno e e-mail." : "Preencha nome, turno, e-mail e senha.", "erro");
       return;
     }
 
