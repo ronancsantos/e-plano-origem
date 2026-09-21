@@ -1,6 +1,4 @@
 ﻿const express = require("express");
-const path = require("path");
-const fs = require("fs");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const authRoutes = require("./routes/auth");
@@ -12,8 +10,21 @@ app.set("trust proxy", 1);
 const allowedOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
-  "https://eplano.semedcarutapera.com"
-];
+  "https://eplano.semedcarutapera.com",
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
+const isAllowedOrigin = (origin) => {
+  if (allowedOrigins.includes(origin)) return true;
+
+  try {
+    const url = new URL(origin);
+    const isLocal = url.protocol === "http:" && ["localhost", "127.0.0.1"].includes(url.hostname);
+    return isLocal || url.hostname.endsWith(".vercel.app");
+  } catch {
+    return false;
+  }
+};
 
 app.use((req, res, next) => {
   const host = req.headers.host || "";
@@ -40,7 +51,7 @@ app.use(cors({
     // permite requests sem origin (mobile, postman)
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
+    if (isAllowedOrigin(origin)) {
       return callback(null, true);
     }
 
@@ -51,6 +62,10 @@ app.use(cors({
 
 app.use(express.json({ limit: "8mb" }));
 app.use("/auth", authRoutes);
+
+app.get("/health", (_req, res) => {
+  res.json({ ok: true });
+});
 
 const parsePeriodo = (p) => {
   try {
@@ -924,64 +939,4 @@ app.post("/professores/:professorId/modelos/:modeloId/plano", async (req, res) =
   }
 });
 
-const frontendDist = path.resolve(__dirname, "../dist");
-const frontendIndex = path.join(frontendDist, "index.html");
-const frontendAssets = path.join(frontendDist, "assets");
-
-app.get("/__static-check", (req, res) => {
-  res.json({
-    cwd: process.cwd(),
-    dirname: __dirname,
-    frontendDist,
-    frontendIndex,
-    frontendAssets,
-    distExiste: fs.existsSync(frontendDist),
-    indexExiste: fs.existsSync(frontendIndex),
-    assetsExiste: fs.existsSync(frontendAssets),
-    assets: fs.existsSync(frontendAssets) ? fs.readdirSync(frontendAssets) : []
-  });
-});
-
-// Servir arquivos estáticos do frontend (dist)
-app.use(
-  "/assets",
-  express.static(frontendAssets, {
-    fallthrough: false,
-    etag: false,
-    maxAge: 0,
-    setHeaders: (res) => {
-      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-      res.setHeader("Pragma", "no-cache");
-      res.setHeader("Expires", "0");
-    }
-  })
-);
-
-app.use(express.static(frontendDist, {
-  etag: false,
-  maxAge: 0,
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith("index.html")) {
-      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-      res.setHeader("Pragma", "no-cache");
-      res.setHeader("Expires", "0");
-    }
-  }
-}));
-
-// SPA fallback - servir index.html para rotas não encontradas
-app.use((req, res) => {
-  if (!fs.existsSync(frontendIndex)) {
-    return res.status(500).type("text/plain").send(`Frontend não encontrado em ${frontendIndex}`);
-  }
-
-  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "0");
-  res.sendFile(frontendIndex);
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("Servidor rodando na porta", PORT);
-});
+module.exports = app;

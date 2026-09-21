@@ -1,4 +1,7 @@
-const API = import.meta.env.VITE_API_URL || "https://eplano-backend.onrender.com";
+// Em producao, a API roda no mesmo dominio do frontend (Vercel Serverless).
+// VITE_API_URL continua disponivel para apontar para o servidor local durante
+// o desenvolvimento ou para outro ambiente, quando necessario.
+const API = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 
 // 🔹 LISTAR PLANOS
 export const listarPlanos = async () => {

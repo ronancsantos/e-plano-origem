@@ -1,16 +1,36 @@
-# React + Vite
+# E-Plano
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicacao React/Vite com API Express e banco Supabase. Frontend e API sao
+publicados juntos na Vercel; nao e necessario manter um backend no Render.
 
-Currently, two official plugins are available:
+## Desenvolvimento local
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Instale as dependencias na raiz com `npm install`.
+2. Copie `.env.example` para `backend/.env` e preencha as credenciais.
+3. Execute `npm run dev` para iniciar a API e o frontend juntos.
 
-## React Compiler
+No desenvolvimento, o Vite monta a API Express no caminho `/api`. Frontend e
+API usam um unico processo e ficam disponíveis em `http://localhost:5173`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Deploy na Vercel
 
-## Expanding the ESLint configuration
+Importe este repositorio na Vercel e cadastre estas variaveis no projeto:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `JWT_SECRET`
+- `FRONTEND_URL` (opcional, para um dominio adicional)
+
+Nao configure `VITE_API_URL` em producao. Sem essa variavel, o frontend usa
+`/api` no proprio dominio. O arquivo `server.js` da raiz exporta o Express para
+uma funcao serverless e tambem entrega o build do Vite. A verificacao da API
+fica disponivel em `/api/health`.
+
+O comando de build e `npm run vercel-build`. Nenhuma configuracao do Render e
+necessaria.
+
+## Seguranca
+
+Arquivos `.env` nao devem ser versionados. Se alguma chave real ja tiver sido
+enviada ao repositorio, rotacione-a no Supabase e substitua tambem `JWT_SECRET`.
