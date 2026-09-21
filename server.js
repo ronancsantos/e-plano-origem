@@ -17,4 +17,14 @@ app.get("*splat", (_req, res) => {
   res.sendFile(path.join(distDir, "index.html"));
 });
 
+const port = Number(process.env.PORT) || 3000;
+const server = app.listen(port, "0.0.0.0", () => {
+  console.log(`E-Plano ativo na porta ${port}`);
+});
+
+server.on("error", (error) => {
+  console.error("Falha ao iniciar o E-Plano:", error);
+  process.exitCode = 1;
+});
+
 export default app;

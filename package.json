@@ -1,8 +1,12 @@
 {
   "name": "e-plano",
+  "main": "server.js",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20 <25"
+  },
   "scripts": {
     "dev": "vite --strictPort",
     "dev:api": "npm --prefix backend start",
@@ -11,7 +15,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "vercel-build": "npm run build",
-    "start": "npm --prefix backend start"
+    "start": "node server.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.107.0",
