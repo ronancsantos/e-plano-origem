@@ -1,10 +1,14 @@
 const app = require("./server");
+const { startSupabaseKeepAlive } = require("./supabaseKeepAlive");
 
 const PORT = Number(process.env.PORT) || 3001;
 
 const server = app.listen(PORT, "127.0.0.1", () => {
   console.log(`Servidor local ativo em http://127.0.0.1:${PORT}`);
 });
+
+const stopSupabaseKeepAlive = startSupabaseKeepAlive();
+server.on("close", stopSupabaseKeepAlive);
 
 server.on("error", (error) => {
   if (error.code === "EADDRINUSE") {

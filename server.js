@@ -6,6 +6,7 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const api = require("./backend/server.js");
+const { startSupabaseKeepAlive } = require("./backend/supabaseKeepAlive.js");
 const app = express();
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.join(rootDir, "dist");
@@ -39,6 +40,9 @@ const port = Number(process.env.PORT) || 3000;
 const server = app.listen(port, "0.0.0.0", () => {
   console.log(`E-Plano ativo na porta ${port}`);
 });
+
+const stopSupabaseKeepAlive = startSupabaseKeepAlive();
+server.on("close", stopSupabaseKeepAlive);
 
 server.on("error", (error) => {
   console.error("Falha ao iniciar o E-Plano:", error);
