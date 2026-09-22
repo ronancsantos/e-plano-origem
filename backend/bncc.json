@@ -677,6 +677,22 @@
                 ]
               },
               {
+                "nome_objeto": "Estratégias e procedimentos de leitura em textos reivindicatórios ou propositivos",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF89LP20) Comparar propostas políticas e de solução de problemas, identificando o que se pretende fazer/implementar, por que (motivações, justificativas), para que (objetivos, benefícios e consequências esperados), como (ações e passos), quando etc. e a forma de avaliar a eficácia da proposta/solução, contrastando dados e informações de diferentes fontes, identificando coincidências, complementaridades e contradições, de forma a poder compreender e posicionar-se criticamente sobre os dados e informações usados em fundamentação de propostas e analisar a coerência entre os elementos, de forma a tomar decisões fundamentadas."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Escuta Apreender o sentido geral dos textos Apreciação e réplica Produção/Proposta",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF89LP22) Compreender e comparar as diferentes posições e interesses em jogo em uma discussão ou apresentação de propostas, avaliando a validade e força dos argumentos e as consequências do que está sendo proposto e, quando for o caso, formular e negociar propostas de diferentes naturezas relativas a interesses coletivos envolvendo a escola ou comunidade escolar."
+                  }
+                ]
+              },
+              {
                 "nome_objeto": "Relação entre textos",
                 "habilidades": [
                   {
@@ -1009,6 +1025,22 @@
                   },
                   {
                     "nome_habilidade": "(EF07LP02) Comparar notícias e reportagens sobre um mesmo fato divulgadas em diferentes mídias, analisando as especificidades das mídias, os processos de (re)elaboração dos textos e a convergência das mídias em notícias ou reportagens multissemióticas."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Estratégias e procedimentos de leitura em textos reivindicatórios ou propositivos",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF89LP20) Comparar propostas políticas e de solução de problemas, identificando o que se pretende fazer/implementar, por que (motivações, justificativas), para que (objetivos, benefícios e consequências esperados), como (ações e passos), quando etc. e a forma de avaliar a eficácia da proposta/solução, contrastando dados e informações de diferentes fontes, identificando coincidências, complementaridades e contradições, de forma a poder compreender e posicionar-se criticamente sobre os dados e informações usados em fundamentação de propostas e analisar a coerência entre os elementos, de forma a tomar decisões fundamentadas."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Escuta Apreender o sentido geral dos textos Apreciação e réplica Produção/Proposta",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF89LP22) Compreender e comparar as diferentes posições e interesses em jogo em uma discussão ou apresentação de propostas, avaliando a validade e força dos argumentos e as consequências do que está sendo proposto e, quando for o caso, formular e negociar propostas de diferentes naturezas relativas a interesses coletivos envolvendo a escola ou comunidade escolar."
                   }
                 ]
               },
@@ -1350,6 +1382,7 @@
                   }
                 ]
               },
+          
               {
                 "nome_objeto": "Textualização, revisão e edição",
                 "habilidades": [
@@ -1709,7 +1742,14 @@
                   }
                 ]
               },
-              
+              {
+                "nome_objeto": "Estratégia de produção: planejamento de textos reivindicatórios ou propositivos",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF89LP21) Realizar enquetes e pesquisas de opinião, de forma a levantar prioridades, problemas a resolver ou propostas que possam contribuir para melhoria da escola ou da comunidade, caracterizar demanda/necessidade, documentando-a de diferentes maneiras por meio de diferentes procedimentos, gêneros e mídias e, quando for o caso, selecionar informações e dados relevantes de fontes pertinentes diversas (sites, impressos, vídeos etc.), avaliando a qualidade e a utilidade dessas fontes, que possam servir de contextualização e fundamentação de propostas, de forma a justificar a proposição de propostas, projetos culturais e ações de intervenção."
+                  }
+                ]
+              },
               {
                 "nome_objeto": "Textualização, revisão e edição",
                 "habilidades": [
@@ -1896,6 +1936,14 @@
                 "habilidades": [
                   {
                     "nome_habilidade": "(EF69LP50) Elaborar texto teatral, a partir da adaptação de romances, contos, mitos, narrativas de enigma e de aventura, novelas, biografias romanceadas, crônicas, dentre outros, indicando as rubricas para caracterização do cenário, do espaço, do tempo; explicitando a caracterização física e psicológica dos personagens e dos seus modos de ação; reconfigurando a inserção do discurso direto e dos tipos de narrador; explicitando as marcas de variação linguística (dialetos, registros e jargões) e retextualizando o tratamento da temática."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Estratégia de produção: planejamento de textos reivindicatórios ou propositivos",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF89LP21) Realizar enquetes e pesquisas de opinião, de forma a levantar prioridades, problemas a resolver ou propostas que possam contribuir para melhoria da escola ou da comunidade, caracterizar demanda/necessidade, documentando-a de diferentes maneiras por meio de diferentes procedimentos, gêneros e mídias e, quando for o caso, selecionar informações e dados relevantes de fontes pertinentes diversas (sites, impressos, vídeos etc.), avaliando a qualidade e a utilidade dessas fontes, que possam servir de contextualização e fundamentação de propostas, de forma a justificar a proposição de propostas, projetos culturais e ações de intervenção."
                   }
                 ]
               },
