@@ -1351,6 +1351,22 @@
                 ]
               },
               {
+                "nome_objeto": "Textualização, revisão e edição",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF69LP22) Produzir, revisar e editar textos reivindicatórios ou propositivos sobre problemas que afetam a vida escolar ou da comunidade, justificando pontos de vista, reivindicações e detalhando propostas (justificativa, objetivos, ações previstas etc.), levando em conta seu contexto de produção e as características dos gêneros em questão."
+                  }
+                ]
+              },
+               {
+                "nome_objeto": "Registro",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF69LP26) Tomar nota em discussões, debates, palestras, apresentação de propostas, reuniões, como forma de documentar o evento e apoiar a própria fala (que pode se dar no momento do evento ou posteriormente, quando, por exemplo, for necessária a retomada dos assuntos tratados em outros contextos públicos, como diante dos representados)."
+                  }
+                ]
+              },
+              {
                 "nome_objeto": "Consideração das condições de produção Estratégias de produção: planejamento, textualização e revisão/edição",
                 "habilidades": [
                   {
@@ -1509,6 +1525,23 @@
                 "habilidades": [
                   {
                     "nome_habilidade": "(EF69LP50) Elaborar texto teatral, a partir da adaptação de romances, contos, mitos, narrativas de enigma e de aventura, novelas, biografias romanceadas, crônicas, dentre outros, indicando as rubricas para caracterização do cenário, do espaço, do tempo; explicitando a caracterização física e psicológica dos personagens e dos seus modos de ação; reconfigurando a inserção do discurso direto e dos tipos de narrador; explicitando as marcas de variação linguística (dialetos, registros e jargões) e retextualizando o tratamento da temática."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Textualização, revisão e edição",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF69LP22) Produzir, revisar e editar textos reivindicatórios ou propositivos sobre problemas que afetam a vida escolar ou da comunidade, justificando pontos de vista, reivindicações e detalhando propostas (justificativa, objetivos, ações previstas etc.), levando em conta seu contexto de produção e as características dos gêneros em questão."
+                  }
+                ]
+              },
+              
+               {
+                "nome_objeto": "Registro",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF69LP26) Tomar nota em discussões, debates, palestras, apresentação de propostas, reuniões, como forma de documentar o evento e apoiar a própria fala (que pode se dar no momento do evento ou posteriormente, quando, por exemplo, for necessária a retomada dos assuntos tratados em outros contextos públicos, como diante dos representados)."
                   }
                 ]
               },
@@ -1673,6 +1706,26 @@
                 "habilidades": [
                   {
                     "nome_habilidade": "(EF69LP50) Elaborar texto teatral, a partir da adaptação de romances, contos, mitos, narrativas de enigma e de aventura, novelas, biografias romanceadas, crônicas, dentre outros, indicando as rubricas para caracterização do cenário, do espaço, do tempo; explicitando a caracterização física e psicológica dos personagens e dos seus modos de ação; reconfigurando a inserção do discurso direto e dos tipos de narrador; explicitando as marcas de variação linguística (dialetos, registros e jargões) e retextualizando o tratamento da temática."
+                  }
+                ]
+              },
+              
+              {
+                "nome_objeto": "Textualização, revisão e edição",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF69LP22) Produzir, revisar e editar textos reivindicatórios ou propositivos sobre problemas que afetam a vida escolar ou da comunidade, justificando pontos de vista, reivindicações e detalhando propostas (justificativa, objetivos, ações previstas etc.), levando em conta seu contexto de produção e as características dos gêneros em questão."
+                  },
+                  {
+                    "nome_habilidade": "(EF69LP23) Contribuir com a escrita de textos normativos, quando houver esse tipo de demanda na escola – regimentos e estatutos de organizações da sociedade civil do âmbito da atuação das crianças e jovens (grêmio livre, clubes de leitura, associações culturais etc.) – e de regras e regulamentos nos vários âmbitos da escola – campeonatos, festivais, regras de convivência etc., levando em conta o contexto de produção e as características dos gêneros em questão."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Apreciação e réplica",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF69LP21) Posicionar-se em relação a conteúdos veiculados em práticas não institucionalizadas de participação social, sobretudo àquelas vinculadas a manifestações artísticas, produções culturais, intervenções urbanas e práticas próprias das culturas juvenis que pretendam denunciar, expor uma problemática ou “convocar” para uma reflexão/ação, relacionando esse texto/produção com seu contexto de produção e relacionando as partes e semioses presentes para a construção de sentidos."
                   }
                 ]
               },
@@ -1843,6 +1896,43 @@
                 "habilidades": [
                   {
                     "nome_habilidade": "(EF69LP50) Elaborar texto teatral, a partir da adaptação de romances, contos, mitos, narrativas de enigma e de aventura, novelas, biografias romanceadas, crônicas, dentre outros, indicando as rubricas para caracterização do cenário, do espaço, do tempo; explicitando a caracterização física e psicológica dos personagens e dos seus modos de ação; reconfigurando a inserção do discurso direto e dos tipos de narrador; explicitando as marcas de variação linguística (dialetos, registros e jargões) e retextualizando o tratamento da temática."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Textualização, revisão e edição",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF69LP22) Produzir, revisar e editar textos reivindicatórios ou propositivos sobre problemas que afetam a vida escolar ou da comunidade, justificando pontos de vista, reivindicações e detalhando propostas (justificativa, objetivos, ações previstas etc.), levando em conta seu contexto de produção e as características dos gêneros em questão."
+                  },
+                  {
+                    "nome_habilidade": "(EF69LP23) Contribuir com a escrita de textos normativos, quando houver esse tipo de demanda na escola – regimentos e estatutos de organizações da sociedade civil do âmbito da atuação das crianças e jovens (grêmio livre, clubes de leitura, associações culturais etc.) – e de regras e regulamentos nos vários âmbitos da escola – campeonatos, festivais, regras de convivência etc., levando em conta o contexto de produção e as características dos gêneros em questão."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Apreciação e réplica",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF69LP21) Posicionar-se em relação a conteúdos veiculados em práticas não institucionalizadas de participação social, sobretudo àquelas vinculadas a manifestações artísticas, produções culturais, intervenções urbanas e práticas próprias das culturas juvenis que pretendam denunciar, expor uma problemática ou “convocar” para uma reflexão/ação, relacionando esse texto/produção com seu contexto de produção e relacionando as partes e semioses presentes para a construção de sentidos."
+                  }
+                ]
+              },{
+                "nome_objeto": "Textualização, revisão e edição",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF69LP22) Produzir, revisar e editar textos reivindicatórios ou propositivos sobre problemas que afetam a vida escolar ou da comunidade, justificando pontos de vista, reivindicações e detalhando propostas (justificativa, objetivos, ações previstas etc.), levando em conta seu contexto de produção e as características dos gêneros em questão."
+                  },
+                  {
+                    "nome_habilidade": "(EF69LP23) Contribuir com a escrita de textos normativos, quando houver esse tipo de demanda na escola – regimentos e estatutos de organizações da sociedade civil do âmbito da atuação das crianças e jovens (grêmio livre, clubes de leitura, associações culturais etc.) – e de regras e regulamentos nos vários âmbitos da escola – campeonatos, festivais, regras de convivência etc., levando em conta o contexto de produção e as características dos gêneros em questão."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Apreciação e réplica",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF69LP21) Posicionar-se em relação a conteúdos veiculados em práticas não institucionalizadas de participação social, sobretudo àquelas vinculadas a manifestações artísticas, produções culturais, intervenções urbanas e práticas próprias das culturas juvenis que pretendam denunciar, expor uma problemática ou “convocar” para uma reflexão/ação, relacionando esse texto/produção com seu contexto de produção e relacionando as partes e semioses presentes para a construção de sentidos."
                   }
                 ]
               },
@@ -2037,6 +2127,30 @@
                 ]
               },
               {
+                "nome_objeto": "Figuras de linguagem",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF67LP38) Analisar os efeitos de sentido do uso de figuras de linguagem, como comparação, metáfora, metonímia, personificação, hipérbole, dentre outras."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Fono-ortografia",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF67LP32) Escrever palavras com correção ortográfica, obedecendo as convenções da língua escrita."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Semântica Coesão",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF07LP12) Reconhecer recursos de coesão referencial: substituições lexicais (de substantivos por sinônimos) ou pronominais (uso de pronomes anafóricos – pessoais, possessivos, demonstrativos)."
+                  }
+                ]
+              },
+              {
                 "nome_objeto": "Variação linguística",
                 "habilidades": [
                   {
@@ -2151,6 +2265,30 @@
                 ]
               },
               {
+                "nome_objeto": "Figuras de linguagem",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF67LP38) Analisar os efeitos de sentido do uso de figuras de linguagem, como comparação, metáfora, metonímia, personificação, hipérbole, dentre outras."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Fono-ortografia",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF67LP32) Escrever palavras com correção ortográfica, obedecendo as convenções da língua escrita."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Semântica Coesão",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF07LP12) Reconhecer recursos de coesão referencial: substituições lexicais (de substantivos por sinônimos) ou pronominais (uso de pronomes anafóricos – pessoais, possessivos, demonstrativos)."
+                  }
+                ]
+              },
+              {
                 "nome_objeto": "Variação linguística",
                 "habilidades": [
                   {
@@ -2255,6 +2393,30 @@
                 ]
               },
               {
+                "nome_objeto": "Modalização",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF69LP28) Observar os mecanismos de modalização adequados aos textos jurídicos, as modalidades deônticas, que se referem ao eixo da conduta (obrigatoriedade/permissibilidade) como, por exemplo: Proibição: “Não se deve fumar em recintos fechados.”; Obrigatoriedade: “A vida tem que valer a pena.”; Possibilidade: “É permitido a entrada de menores acompanhados de adultos responsáveis”, e os mecanismos de modalização adequados aos textos políticos e propositivos, as modalidades apreciativas, em que o locutor exprime um juízo de valor (positivo ou negativo) acerca do que enuncia. Por exemplo: “Que belo discurso!”, “Discordo das escolhas de Antônio.” “Felizmente, o buraco ainda não causou acidentes mais graves.”"
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Morfossintaxe",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF08LP12) Identificar, em textos lidos, orações subordinadas com conjunções de uso frequente, incorporando-as às suas próprias produções."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Semântica",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF08LP14) Utilizar, ao produzir texto, recursos de coesão sequencial (articuladores) e referencial (léxica e pronominal), construções passivas e impessoais, discurso direto e indireto e outros recursos expressivos adequados ao gênero textual."
+                  }
+                ]
+              },
+              {
                 "nome_objeto": "Variação linguística",
                 "habilidades": [
                   {
@@ -2344,6 +2506,30 @@
                 "habilidades": [
                   {
                     "nome_habilidade": "(EF69LP54) Analisar os efeitos de sentido decorrentes da interação entre os elementos linguísticos e os recursos paralinguísticos e cinésicos, como as variações no ritmo, as modulações no tom de voz, as pausas, as manipulações do estrato sonoro da linguagem, obtidos por meio da estrofação, das rimas e de figuras de linguagem como as aliterações, as assonâncias, as onomatopeias, dentre outras, a postura corporal e a gestualidade, na declamação de poemas, apresentações musicais e teatrais, tanto em gêneros em prosa quanto nos gêneros poéticos, os efeitos de sentido decorrentes do emprego de figuras de linguagem, tais como comparação, metáfora, personificação, metonímia, hipérbole, eufemismo, ironia, paradoxo e antítese e os efeitos de sentido decorrentes do emprego de palavras e expressões denotativas e conotativas (adjetivos, locuções adjetivas, orações subordinadas adjetivas etc.), que funcionam como modificadores, percebendo sua função na caracterização dos espaços, tempos, personagens e ações próprios de cada gênero narrativo."
+                  }
+                ]
+              },
+               {
+                "nome_objeto": "Modalização",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF69LP28) Observar os mecanismos de modalização adequados aos textos jurídicos, as modalidades deônticas, que se referem ao eixo da conduta (obrigatoriedade/permissibilidade) como, por exemplo: Proibição: “Não se deve fumar em recintos fechados.”; Obrigatoriedade: “A vida tem que valer a pena.”; Possibilidade: “É permitido a entrada de menores acompanhados de adultos responsáveis”, e os mecanismos de modalização adequados aos textos políticos e propositivos, as modalidades apreciativas, em que o locutor exprime um juízo de valor (positivo ou negativo) acerca do que enuncia. Por exemplo: “Que belo discurso!”, “Discordo das escolhas de Antônio.” “Felizmente, o buraco ainda não causou acidentes mais graves.”"
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Morfossintaxe",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF08LP12) Identificar, em textos lidos, orações subordinadas com conjunções de uso frequente, incorporando-as às suas próprias produções."
+                  }
+                ]
+              },
+              {
+                "nome_objeto": "Semântica",
+                "habilidades": [
+                  {
+                    "nome_habilidade": "(EF08LP14) Utilizar, ao produzir texto, recursos de coesão sequencial (articuladores) e referencial (léxica e pronominal), construções passivas e impessoais, discurso direto e indireto e outros recursos expressivos adequados ao gênero textual."
                   }
                 ]
               },
